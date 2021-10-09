@@ -1,0 +1,36 @@
+{
+  "name": "@wefly/nxxt",
+  "version": "1.0.0",
+  "description": "Rendering scaffolding of server based on vite, Vue 3.0",
+  "bin": {
+    "nxxt": "bin/nxxt.js"
+  },
+  "types": "types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vitaminaq/nxxt.git",
+    "directory": "."
+  },
+  "keywords": [
+    "vue",
+    "ssr",
+    "vite",
+    "cli"
+  ],
+  "author": "Vitaminaq",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Vitaminaq/nxxt/issues"
+  },
+  "homepage": "https://github.com/Vitaminaq/nxxt",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "commander": "^8.2.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "^12.0.0 || >= 14.0.0"
+  }
+}
