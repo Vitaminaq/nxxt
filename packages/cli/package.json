@@ -1,0 +1,38 @@
+{
+  "name": "vite",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Evan You",
+  "description": "Native-ESM powered web dev build tool",
+  "bin": {
+    "nxxt": "bin/nxxt.js"
+  },
+  "main": "src/cli.js",
+  "types": "src/cli.js",
+  "files": [
+    "bin",
+    "dist",
+    "client.d.ts",
+    "src/client",
+    "types"
+  ],
+  "engines": {
+    "node": ">=12.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vitaminaq/nxxt.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Vitaminaq/nxxt/issues"
+  },
+  "homepage": "https://github.com/Vitaminaq/nxxt/tree/main/packages/cli#readme",
+  "scripts": {},
+  "dependencies": {
+    "create-require": "^1.1.1",
+    "jiti": "^1.12.6",
+    "rollup": "^2.58.0",
+    "vite": "^2.6.5"
+  }
+}
