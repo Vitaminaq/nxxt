@@ -1,0 +1,37 @@
+{
+  "name": "create-nxxt",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Vitaminaq",
+  "bin": {
+    "create-nxxt": "index.js",
+    "cnx": "index.js"
+  },
+  "files": [
+    "index.js",
+    "template-*"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s --commit-path . --lerna-package create-nxxt",
+    "release": "node updateVersions && node ../../scripts/release.js --skipBuild"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vitaminaq/nxxt.git",
+    "directory": "packages/create-nxxt"
+  },
+  "bugs": {
+    "url": "https://github.com/Vitaminaq/nxxt/issues"
+  },
+  "homepage": "https://github.com/Vitaminaq/nxxt/tree/main/packages/create-nxxt#readme",
+  "dependencies": {
+    "fs-extra": "^10.0.0",
+    "kolorist": "^1.5.0",
+    "minimist": "^1.2.5",
+    "prompts": "^2.4.1"
+  }
+}

@@ -1,10 +1,10 @@
 {
-  "name": "@wefly/nxxt",
-  "version": "1.0.0",
+  "name": "nxxt-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "description": "Rendering scaffolding of server based on vite, Vue 3.0",
-  "bin": {
-    "nxxt": "bin/nxxt.js"
-  },
   "types": "types/index.d.ts",
   "repository": {
     "type": "git",
@@ -27,9 +27,8 @@
     "access": "public"
   },
   "dependencies": {
-    "commander": "^8.2.0"
+    "conventional-changelog-cli": "^2.1.1"
   },
-  "devDependencies": {},
   "engines": {
     "node": "^12.0.0 || >= 14.0.0"
   }
