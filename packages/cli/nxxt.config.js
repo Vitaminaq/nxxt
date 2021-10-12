@@ -1,3 +1,7 @@
 export default {
-    test: 'xxxx'
+    test: 'xxxx',
+    viteOptions: {
+
+    },
+    
 }
