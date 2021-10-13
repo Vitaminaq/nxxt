@@ -17,15 +17,16 @@ cli
 cli
   .command('build [root]')
   .action(() => {
-        // 获取构建参数
-        const { clientOptions, serverOptions } = getBaseBuildConfig(getNxxtConfig());
+    // 获取构建参数
+    const { clientOptions, serverOptions } = getBaseBuildConfig(getNxxtConfig());
 
-        // 服务端渲染构建
-        build(clientOptions).then(() => {
-            build(serverOptions)
-        });
+    // 服务端渲染构建
+    build(clientOptions).then(() => {
+      build(serverOptions)
+    });
   })
-  cli.help()
-  cli.version(require('../package.json').version)
+
+cli.help()
+cli.version(require('../package.json').version)
   
-  cli.parse()
+cli.parse()
