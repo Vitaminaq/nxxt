@@ -3,4 +3,4 @@ export declare const ssrTransformCustomDir: () => {
     props: never[];
     needRuntime: boolean;
 };
-export declare const buildOptions: UserConfig;
+export declare const getBaseOptions: (options: any) => UserConfig;
