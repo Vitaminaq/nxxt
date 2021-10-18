@@ -1,5 +1,5 @@
 {
-  "name": "vite",
+  "name": "nxxt",
   "version": "1.0.0",
   "license": "MIT",
   "author": "Vitaminaq",
@@ -7,8 +7,8 @@
   "bin": {
     "nxxt": "bin/nxxt.js"
   },
-  "main": "src/cli.js",
-  "types": "src/cli.js",
+  "main": "dist/cli.js",
+  "types": "dist/cli.js",
   "files": [
     "bin",
     "dist",
