@@ -2,6 +2,7 @@ import { cac } from 'cac'
 import { build } from 'vite';
 import { getNxxtConfig } from './config';
 import { getBaseBuildConfig } from './build/index';
+import { server } from './server';
 
 const cli = cac('nxxt');
 
@@ -10,7 +11,9 @@ cli
   .command('[root]') // default command
   .alias('serve')
   .action(() => {
-     console.log('不好意思，此功能正在开发中')
+    // 获取构建参数
+    const { clientOptions, serverOptions } = getBaseBuildConfig(getNxxtConfig());
+    server(clientOptions)
   })
 
 // build

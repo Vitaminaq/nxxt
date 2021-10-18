@@ -1,5 +1,8 @@
 import typescript from '@rollup/plugin-typescript'
-import { getBabelOutputPlugin } from '@rollup/plugin-babel';
+import babel from '@rollup/plugin-babel';
+// import commonjs from "@rollup/plugin-commonjs";
+// import resolve from '@rollup/plugin-node-resolve';
+import json from '@rollup/plugin-json';
 import clear from 'rollup-plugin-clear';
 import path from 'path';
 
@@ -8,9 +11,6 @@ export default {
         cli: path.resolve(__dirname, 'src/cli.ts')
     },
     plugins: [
-        getBabelOutputPlugin({
-            presets: ['@babel/preset-env'],
-        }),
         typescript({
             target: 'es2019',
             include: ['src/**/*.ts', 'types/**'],
@@ -20,6 +20,13 @@ export default {
             tsconfig: 'tsconfig.base.json',
             declaration: true,
             declarationDir: path.resolve(__dirname, 'dist/')
+          }),
+        //   resolve(),
+        //   commonjs(),
+          json(),
+          babel({
+            babelHelpers: 'bundled',
+            presets: ["@babel/preset-env"]
           }),
           clear({
             targets: [ './dist' ]
