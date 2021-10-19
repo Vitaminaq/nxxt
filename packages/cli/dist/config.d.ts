@@ -2,9 +2,12 @@ import { InlineConfig } from 'vite';
 export declare const defaultNxxtConfigFile = "nxxt.config";
 export interface NxxtConfig {
     mode?: string;
+    serverEntry?: string;
 }
 export declare const getNxxtConfig: () => NxxtConfig;
+export declare const getServerEntry: () => string | null;
 export declare const mergeConfig: (inlineConfig: InlineConfig) => {
+    serverEntry: string | null;
     mode: string;
     configFile?: string | false | undefined;
     envFile?: false | undefined;

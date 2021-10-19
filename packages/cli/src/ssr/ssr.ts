@@ -3,7 +3,7 @@ import { Request } from 'express';
 const serialize = require('serialize-javascript');
 import { Server } from './server';
 import { renderHtml } from './render';
-import { getTemplate } from '../utils';
+import { getTemplate, resolve } from '../utils';
 
 export interface SSROptions {
     buildOptions: InlineConfig;
@@ -52,11 +52,11 @@ export class SSR {
             this.render = (await ssrLoadModule('/src/entry-server.ts')).render;
         } else {
             this.template = getTemplate('dist/client/index.html');
-            this.render = require('./dist/server/entry-server.js').render;
+            this.render = require(resolve('dist/server/entry-server.js')).render;
         }
         const { app, store } = await this.render(url, req.query);
 
-        const { rootHtml, preloadLinks } = await renderHtml(app, this.isBuild ? require('./dist/client/ssr-manifest.json') : {});
+        const { rootHtml, preloadLinks } = await renderHtml(app, this.isBuild ? require(resolve('dist/client/ssr-manifest.json')) : {});
 
         // 读取配置文件，注入给客户端
         // const config = require('dotenv').config({ path: resolve(`.env.${process.env.NODE_ENV}`) }).parsed;

@@ -58,7 +58,6 @@ cli
       root,
       ...options
     });
-    // 获取构建参数
     const clientOptions = getClientOptions(config);
     new SSR({
       buildOptions: clientOptions
@@ -68,7 +67,7 @@ cli
 // build
 cli
   .command('build [root]')
-  .action((root: string, options: BuildOptions & GlobalCLIOptions) => {
+  .action(async (root: string, options: BuildOptions & GlobalCLIOptions) => {
     const config = mergeConfig({
       root,
       ...options
@@ -88,7 +87,6 @@ cli
       root,
       ...options
     });
-    // 获取构建参数
     const clientOptions = getClientOptions(config);
     new SSR({
       buildOptions: clientOptions,

@@ -3,8 +3,8 @@
 var cac = require('cac');
 var vite = require('vite');
 var path = require('path');
-var fs = require('fs');
 var jiti = require('jiti');
+var fs = require('fs');
 var vue = require('@vitejs/plugin-vue');
 var vueJsx = require('@vitejs/plugin-vue-jsx');
 var vueLegacy = require('@vitejs/plugin-legacy');
@@ -15,31 +15,40 @@ var serverRenderer = require('@vue/server-renderer');
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e["default"] : e; }
 
 var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
-var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
 var jiti__default = /*#__PURE__*/_interopDefaultLegacy(jiti);
+var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
 var vue__default = /*#__PURE__*/_interopDefaultLegacy(vue);
 var vueJsx__default = /*#__PURE__*/_interopDefaultLegacy(vueJsx);
 var vueLegacy__default = /*#__PURE__*/_interopDefaultLegacy(vueLegacy);
 var express__default = /*#__PURE__*/_interopDefaultLegacy(express);
 
+const resolve = (p) => path__default.resolve(process.cwd(), p);
+const getTemplate = (p) => fs__default.readFileSync(resolve(p), 'utf-8');
+const fileTypes = ['js', 'ts'];
+const getTypeFile = (p) => {
+    const fts = fileTypes.filter((t) => fs__default.existsSync(resolve(`${p}.${t}`)));
+    return fts.length ? `${p}.${fts[0]}` : null;
+};
+
 const defaultNxxtConfigFile = 'nxxt.config';
 const cwd = process.cwd();
-const fileTypes = ['js', 'ts', 'mjs'];
 const getNxxtConfig = () => {
-    const configFileTypes = fileTypes.filter((t) => {
-        return fs__default.existsSync(path__default.resolve(cwd, `${defaultNxxtConfigFile}.${t}`));
-    });
-    if (!configFileTypes)
-        return null;
+    if (!getTypeFile(defaultNxxtConfigFile))
+        return {};
     return jiti__default(path__default.resolve(cwd))(`./${defaultNxxtConfigFile}`).default;
+};
+const getServerEntry = () => {
+    return getTypeFile('src/entry-server');
 };
 const mergeConfig = (inlineConfig) => {
     const nxxtConfig = getNxxtConfig();
     const mode = inlineConfig.mode || nxxtConfig.mode || 'production';
+    const serverEntry = nxxtConfig.serverEntry || getServerEntry();
     process.env.NODE_ENV = mode;
     return {
         ...inlineConfig,
         ...nxxtConfig,
+        serverEntry,
         mode,
     };
 };
@@ -153,9 +162,6 @@ const getBaseBuildConfig = (customConfig) => {
         serverOptions: getServerOptions(customConfig)
     };
 };
-
-const resolve = (p) => path__default.resolve(process.cwd(), p);
-const getTemplate = (p) => fs__default.readFileSync(resolve(p), 'utf-8');
 
 class Server {
     constructor(ssr) {
@@ -305,10 +311,10 @@ class SSR {
         }
         else {
             this.template = getTemplate('dist/client/index.html');
-            this.render = require('./dist/server/entry-server.js').render;
+            this.render = require(resolve('dist/server/entry-server.js')).render;
         }
         const { app, store } = await this.render(url, req.query);
-        const { rootHtml, preloadLinks } = await renderHtml(app, this.isBuild ? require('./dist/client/ssr-manifest.json') : {});
+        const { rootHtml, preloadLinks } = await renderHtml(app, this.isBuild ? require(resolve('dist/client/ssr-manifest.json')) : {});
         // 读取配置文件，注入给客户端
         // const config = require('dotenv').config({ path: resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
         // console.log('读取到的配置', process.env.NODE_ENV, config);
@@ -357,7 +363,6 @@ cli
         root,
         ...options
     });
-    // 获取构建参数
     const clientOptions = getClientOptions(config);
     new SSR({
         buildOptions: clientOptions
@@ -366,7 +371,7 @@ cli
 // build
 cli
     .command('build [root]')
-    .action((root, options) => {
+    .action(async (root, options) => {
     const config = mergeConfig({
         root,
         ...options
@@ -383,7 +388,6 @@ cli
         root,
         ...options
     });
-    // 获取构建参数
     const clientOptions = getClientOptions(config);
     new SSR({
         buildOptions: clientOptions,
