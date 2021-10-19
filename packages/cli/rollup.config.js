@@ -8,7 +8,7 @@ import path from 'path';
 
 export default {
     input: {
-        cli: path.resolve(__dirname, 'src/cli.ts')
+      cli: path.resolve(__dirname, 'src/cli.ts')
     },
     plugins: [
         typescript({

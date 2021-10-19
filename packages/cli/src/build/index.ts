@@ -8,3 +8,8 @@ export const getBaseBuildConfig = (customConfig: any) => {
     }
 }
 
+export {
+    getClientOptions,
+    getServerOptions
+}
+
