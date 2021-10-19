@@ -2,8 +2,9 @@
   "name": "ssr-demo",
   "version": "1.0.0",
   "scripts": {
-    "server": "nxxt server",
-    "build": "nxxt build"
+    "server": "nxxt",
+    "build": "nxxt build",
+    "start": "nxxt start"
   },
   "dependencies": {
     "@wefly/vue-image-lazy-load": "^1.0.0",
