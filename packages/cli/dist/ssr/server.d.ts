@@ -1,6 +1,6 @@
 /// <reference types="node" />
-import { Express } from 'express';
-import { SSR } from './ssr';
+import { Express } from "express";
+import { SSR } from "./ssr";
 export declare class Server {
     ssr: SSR;
     app: Express;

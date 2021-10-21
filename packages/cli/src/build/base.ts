@@ -4,31 +4,19 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import vueLegacy from '@vitejs/plugin-legacy';
 import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
+import { NxxtUserConfig, mergePwa, mergePxToRem, mergeCompilerOptions } from '../config';
 
-export const ssrTransformCustomDir = () => {
-	return {
-		props: [],
-		needRuntime: true,
-	};
-};
-
-export const getBaseOptions = (options: any): UserConfig => {
-    const { pwa, jsx, pxToRem, legacy, alias = {} } = options;
-    const plugins = [
+export const getBaseOptions = (options: NxxtUserConfig): UserConfig => {
+    const { pwa, jsx, pxToRem, legacy, alias = {}, compilerOptions, viteOptions } = options;
+    const baseOptions = { ...viteOptions }
+    let { plugins = [], esbuild = {}, resolve = {}, css = {} } = baseOptions;
+    plugins = [
+        ...plugins,
         vue({
             template: {
-                compilerOptions: {
-                    directiveTransforms: {
-                        'img-lazy-load': ssrTransformCustomDir,
-                        rescroll: ssrTransformCustomDir,
-                    },
-                    isCustomElement: (tag: string) => {
-                        if (tag === 'wx-open-launch-weapp') return true;
-                        return false;
-                    },
-                },
-            },
-        }),
+                compilerOptions: compilerOptions ? mergeCompilerOptions(compilerOptions) : {} as any
+            }
+        })
     ]
     legacy && plugins.push(
         vueLegacy({
@@ -36,53 +24,29 @@ export const getBaseOptions = (options: any): UserConfig => {
         })
     )
     jsx && plugins.push(vueJsx());
-    pwa && plugins.push(
-        VitePWA({
-            strategies: 'generateSW',
-            manifest: {},
-            workbox: {
-                cacheId: 'kbb',
-                sourcemap: false,
-                globIgnores: ['node_modules/**', '*.js', '*.css'],
-                globPatterns: [],
-                runtimeCaching: [
-                    {
-                        urlPattern: /\/.*(\?|&)v=.*/,
-                        handler: 'StaleWhileRevalidate',
-                    },
-                    {
-                        urlPattern: /\/api\/.*(\?|&)/,
-                        handler: 'NetworkFirst',
-                    },
-                    {
-                        urlPattern: /\.(?:png|gif|jpg|jpeg|webp|svg)$/,
-                        handler: 'StaleWhileRevalidate',
-                    },
-                ],
-            },
-        }) as any
-    )
-    const baseOptions: any = {
-        plugins,
-        resolve: {
-            alias: {
-                '@': path.resolve(process.cwd(), './src'),
-                ...alias
-            },
-        },
+    pwa && plugins.push(VitePWA(mergePwa(pwa)));
+
+    baseOptions.plugins = plugins;
+
+    baseOptions.resolve = {
+        ...resolve,
+        alias: {
+            ...resolve.alias,
+            '@': path.resolve(process.cwd(), './src'),
+            ...alias
+        }
     }
+
     pxToRem && (baseOptions.css = {
+        ...css,
         postcss: {
             plugins: [
-                require('postcss-pxtorem')({
-                    rootValue: 37.5,
-                    propList: ['*'],
-                }),
+                require('postcss-pxtorem')(mergePxToRem(pxToRem)),
             ],
         },
     });
-
     jsx && (baseOptions.esbuild = {
+        ...esbuild,
         jsxFactory: 'h',
         jsxFragment: 'Fragment',
     })

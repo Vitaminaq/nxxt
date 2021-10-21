@@ -1,0 +1,20 @@
+{
+  "name": "@nxxt/vue-app",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/vue-app.js",
+  "typings": "index.d.ts",
+  "files": [
+    "dist",
+    "template",
+    "vetur",
+    "web-types",
+    "index.d.ts"
+  ],
+  "dependencies": {
+    "vue-router": "4.0.10"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

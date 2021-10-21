@@ -1,35 +1,45 @@
-import { InlineConfig } from 'vite';
+import { InlineConfig, AliasOptions, UserConfig } from "vite";
+import { Options } from "vite-plugin-pwa";
 export declare const defaultNxxtConfigFile = "nxxt.config";
-export interface NxxtConfig {
-    mode?: string;
-    serverEntry?: string;
+export interface CompilerOptions {
+    runtimeDirective?: string[];
+    customDirective?: string[];
+    customElement?: string[];
 }
-export declare const getNxxtConfig: () => NxxtConfig;
+export declare type PxToRemOptions = {
+    rootValue: number;
+    propList: string[];
+} | boolean;
+export declare type PwaOptions = boolean | Partial<Options>;
+export interface NxxtUserConfig {
+    root?: string;
+    base?: string;
+    mode?: string;
+    port?: number;
+    jsx?: boolean;
+    legacy?: boolean;
+    compilerOptions?: CompilerOptions;
+    serverEntry?: string;
+    alias?: AliasOptions;
+    pxToRem?: PxToRemOptions;
+    pwa?: PwaOptions;
+    viteOptions?: UserConfig;
+}
+export declare const defineNxxtConfig: (options: NxxtUserConfig) => NxxtUserConfig;
+export declare const getNxxtConfig: () => NxxtUserConfig;
 export declare const getServerEntry: () => string | null;
-export declare const mergeConfig: (inlineConfig: InlineConfig) => {
-    serverEntry: string | null;
-    mode: string;
-    configFile?: string | false | undefined;
-    envFile?: false | undefined;
-    root?: string | undefined;
-    base?: string | undefined;
-    publicDir?: string | false | undefined;
-    cacheDir?: string | undefined;
-    define?: Record<string, any> | undefined;
-    plugins?: (import("vite").PluginOption | import("vite").PluginOption[])[] | undefined;
-    resolve?: (import("vite").ResolveOptions & {
-        alias?: import("vite").AliasOptions | undefined;
-    }) | undefined;
-    css?: import("vite").CSSOptions | undefined;
-    json?: import("vite").JsonOptions | undefined;
-    esbuild?: false | import("vite").ESBuildOptions | undefined;
-    assetsInclude?: string | RegExp | (string | RegExp)[] | undefined;
-    server?: import("vite").ServerOptions | undefined;
-    build?: import("vite").BuildOptions | undefined;
-    optimizeDeps?: import("vite").DepOptimizationOptions | undefined;
-    logLevel?: import("vite").LogLevel | undefined;
-    clearScreen?: boolean | undefined;
-    envDir?: string | undefined;
-    alias?: import("vite").AliasOptions | undefined;
-    dedupe?: string[] | undefined;
+export declare const getClientEntry: () => string;
+export declare const mergeNxxtConfig: (inlineConfig: InlineConfig) => NxxtUserConfig;
+export declare const getSsrTransformCustomDir: (runTime?: boolean) => () => {
+    props: never[];
+    needRuntime: boolean;
 };
+export declare const mergeCompilerOptions: ({ runtimeDirective, customDirective, customElement, }: CompilerOptions) => {
+    directiveTransforms: Record<string, any>;
+    isCustomElement: (tag: string) => boolean;
+};
+export declare const mergePxToRem: (options: PxToRemOptions) => {
+    rootValue: number;
+    propList: string[];
+};
+export declare const mergePwa: (options: PwaOptions) => Partial<Options>;

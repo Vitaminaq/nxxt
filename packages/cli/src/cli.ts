@@ -1,100 +1,101 @@
-import { cac } from 'cac'
-import { build, LogLevel, ServerOptions, BuildOptions } from 'vite';
-import { mergeConfig } from './config';
-import { getBaseBuildConfig, getClientOptions } from './build/index';
-import { SSR } from './ssr/ssr';
+import { cac } from "cac";
+import { build, LogLevel, ServerOptions, BuildOptions } from "vite";
+import { mergeNxxtConfig } from "./config";
+import { getBaseBuildConfig, getClientOptions } from "./build/index";
+import { SSR } from "./ssr/ssr";
 
-const cli = cac('nxxt');
+const cli = cac("nxxt");
 
 interface GlobalCLIOptions {
-  '--'?: string[]
-  c?: boolean | string
-  config?: string
-  r?: string
-  root?: string
-  base?: string
-  l?: LogLevel
-  logLevel?: LogLevel
-  clearScreen?: boolean
-  d?: boolean | string
-  debug?: boolean | string
-  f?: string
-  filter?: string
-  m?: string
-  mode?: string
+  "--"?: string[];
+  c?: boolean | string;
+  config?: string;
+  r?: string;
+  root?: string;
+  base?: string;
+  l?: LogLevel;
+  logLevel?: LogLevel;
+  clearScreen?: boolean;
+  d?: boolean | string;
+  debug?: boolean | string;
+  f?: string;
+  filter?: string;
+  m?: string;
+  mode?: string;
 }
 
-// function cleanOptions<Options extends GlobalCLIOptions>(
-//   options: Options
-// ): Omit<Options, keyof GlobalCLIOptions> {
-//   const ret = { ...options }
-//   delete ret['--']
-//   delete ret.c
-//   delete ret.config
-//   delete ret.r
-//   delete ret.root
-//   delete ret.base
-//   delete ret.l
-//   delete ret.logLevel
-//   delete ret.clearScreen
-//   delete ret.d
-//   delete ret.debug
-//   delete ret.f
-//   delete ret.filter
-//   delete ret.m
-//   delete ret.mode
-//   return ret
-// }
+function cleanOptions<Options extends GlobalCLIOptions>(
+  options: Options
+): Omit<Options, keyof GlobalCLIOptions> {
+  const ret = { ...options }
+  delete ret['--']
+  // delete ret.c
+  // delete ret.config
+  // delete ret.r
+  // delete ret.root
+  // delete ret.base
+  // delete ret.l
+  // delete ret.logLevel
+  // delete ret.clearScreen
+  // delete ret.d
+  // delete ret.debug
+  // delete ret.f
+  // delete ret.filter
+  // delete ret.m
+  // delete ret.mode
+  return ret
+}
 
-cli
-  .option('-m, --mode <mode>', `[string] set env mode`)
+cli.option("-m, --mode <mode>", `[string] set env mode`);
 
 // dev
 cli
-  .command('[root]') // default command
-  .alias('serve')
+  .command("[root]") // default command
+  .alias("serve")
   .action((root: string, options: ServerOptions & GlobalCLIOptions) => {
-    const config = mergeConfig({
+    const config = mergeNxxtConfig({
       root,
-      ...options
+      ...cleanOptions(options),
     });
-    const clientOptions = getClientOptions(config);
+    const buildOptions = getClientOptions(config);
     new SSR({
-      buildOptions: clientOptions
-    })
-  })
+      buildOptions,
+      config
+    });
+  });
 
 // build
 cli
-  .command('build [root]')
+  .command("build [root]")
   .action(async (root: string, options: BuildOptions & GlobalCLIOptions) => {
-    const config = mergeConfig({
+    const config = mergeNxxtConfig({
       root,
-      ...options
+      ...cleanOptions(options),
     });
 
     const { clientOptions, serverOptions } = getBaseBuildConfig(config);
 
     build(clientOptions);
     build(serverOptions);
-  })
+  });
 
 // start
 cli
-  .command('start [root]')
+  .command("start [root]")
   .action((root: string, options: ServerOptions & GlobalCLIOptions) => {
-    const config = mergeConfig({
+    const config = mergeNxxtConfig({
       root,
-      ...options
+      ...cleanOptions(options),
     });
-    const clientOptions = getClientOptions(config);
+    const buildOptions = getClientOptions(config);
     new SSR({
-      buildOptions: clientOptions,
-      runType: 'build'
-    })
-  })
+      buildOptions,
+      config,
+      runType: "build",
+    });
+  });
 
-cli.help()
-cli.version(require('../package.json').version)
-  
-cli.parse()
+cli.help();
+cli.version(require("../package.json").version);
+
+cli.parse();

@@ -1,16 +1,13 @@
 import { ReqConfig } from '@/services/publics';
 import Store, { NotifyOptions } from '@wefly/vue-store-next';
-import User from './modules/user';
 
 export class BaseStore extends Store {
 	public subList: NotifyOptions[] = [];
 	// 储存ssr路径
 	public ssrPath = '';
-	public user: User;
 
 	public constructor(reqConfig?: ReqConfig) {
 		super();
-		this.user = new User(reqConfig);
 		// 服务端会增加内存
 		// this.subscribe((event) => {
 		// 	this.subList.push(event);

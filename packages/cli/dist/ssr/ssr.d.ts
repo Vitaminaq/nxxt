@@ -1,9 +1,11 @@
-import { InlineConfig, ViteDevServer } from 'vite';
-import { Request } from 'express';
-import { Server } from './server';
+import { InlineConfig, ViteDevServer } from "vite";
+import { Request } from "express";
+import { Server } from "./server";
+import { NxxtUserConfig } from "../config";
 export interface SSROptions {
     buildOptions: InlineConfig;
-    runType?: 'build' | 'dev';
+    config: NxxtUserConfig;
+    runType?: "build" | "dev";
 }
 export declare class SSR {
     buildOptions: InlineConfig;
@@ -12,8 +14,9 @@ export declare class SSR {
     render: any;
     template: string;
     isBuild: boolean;
-    constructor({ buildOptions, runType }: SSROptions);
-    setEnv(runType: SSROptions['runType']): void;
+    config: NxxtUserConfig;
+    constructor({ buildOptions, runType, config }: SSROptions);
+    setEnv(runType: SSROptions["runType"]): void;
     createServer(): Promise<void>;
     _render(req: Request): Promise<string>;
 }

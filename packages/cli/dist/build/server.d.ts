@@ -1,2 +1,3 @@
 import { UserConfig } from 'vite';
-export declare const getServerOptions: (options: any) => UserConfig;
+import { NxxtUserConfig } from '../config';
+export declare const getServerOptions: (options: NxxtUserConfig) => UserConfig;

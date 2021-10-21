@@ -1,2 +1,3 @@
 import { UserConfig } from 'vite';
-export declare const getClientOptions: (options: any) => UserConfig;
+import { NxxtUserConfig } from '../config';
+export declare const getClientOptions: (options: NxxtUserConfig) => UserConfig;

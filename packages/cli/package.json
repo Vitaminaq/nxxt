@@ -7,13 +7,13 @@
   "bin": {
     "nxxt": "bin/nxxt.js"
   },
-  "main": "dist/cli.js",
-  "types": "dist/cli.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "bin",
     "dist",
-    "client.d.ts",
-    "src/client",
+    "index.d.ts",
+    "src",
     "types"
   ],
   "engines": {
@@ -55,7 +55,7 @@
     "serialize-javascript": "^6.0.0",
     "serve-static": "^1.14.1",
     "vite": "2.4.1",
-    "vite-plugin-pwa": "^0.11.3",
+    "vite-plugin-pwa": "0.5.6",
     "vue": "3.1.5",
     "vue-router": "4.0.10"
   },

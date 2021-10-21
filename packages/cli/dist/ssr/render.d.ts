@@ -1,4 +1,4 @@
-import { App, VNode, RendererNode, RendererElement } from 'vue';
+import { App, VNode, RendererNode, RendererElement } from "vue";
 export declare class Render {
 }
 export declare const renderHtml: (app: App<any> | VNode<RendererNode, RendererElement>, manifest: any) => Promise<{

@@ -8,12 +8,13 @@ import path from 'path';
 
 export default {
     input: {
+      index: path.resolve(__dirname, 'src/index.ts'),
       cli: path.resolve(__dirname, 'src/cli.ts')
     },
     plugins: [
         typescript({
             target: 'es2019',
-            include: ['src/**/*.ts', 'types/**'],
+            include: ['src/**/*.ts', 'types/**', 'node_modules/vite/client'],
             esModuleInterop: true,
             // in production we use api-extractor for dts generation
             // in development we need to rely on the rollup ts plugin
@@ -30,7 +31,7 @@ export default {
           }),
           clear({
             targets: [ './dist' ]
-         }),
+          }),
     ],
     output: {
         dir: path.resolve(__dirname, 'dist'),

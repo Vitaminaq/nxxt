@@ -1,5 +1,5 @@
 <template>
-	<div id="root" @click="show">
+	<div id="root">
 		我是nxxt
 	</div>
 </template>
@@ -20,11 +20,6 @@ html {
 #root {
 	width: 100%;
 	height: auto;
-}
-
-#root img {
-	float: left;
-	width: 100%;
-	height: auto;
+	font-size: 24px;
 }
 </style>
