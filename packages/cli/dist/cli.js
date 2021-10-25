@@ -2,14 +2,15 @@
 
 var cac = require('cac');
 var vite = require('vite');
-var config = require('./config-07369acc.js');
+var config = require('./config-8675cbfd.js');
 var vue = require('@vitejs/plugin-vue');
 var vueJsx = require('@vitejs/plugin-vue-jsx');
 var vueLegacy = require('@vitejs/plugin-legacy');
 var path = require('path');
 var vitePluginPwa = require('vite-plugin-pwa');
-var express = require('express');
 var serverRenderer = require('@vue/server-renderer');
+var express = require('express');
+var dotenv = require('dotenv');
 require('fs');
 require('jiti');
 
@@ -20,6 +21,7 @@ var vueJsx__default = /*#__PURE__*/_interopDefaultLegacy(vueJsx);
 var vueLegacy__default = /*#__PURE__*/_interopDefaultLegacy(vueLegacy);
 var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
 var express__default = /*#__PURE__*/_interopDefaultLegacy(express);
+var dotenv__default = /*#__PURE__*/_interopDefaultLegacy(dotenv);
 
 const getBaseOptions = (options) => {
     const { pwa, jsx, pxToRem, legacy, alias = {}, compilerOptions, viteOptions } = options;
@@ -94,23 +96,73 @@ const getBaseBuildConfig = (customConfig) => {
     };
 };
 
+// register store modules hook
+const registerModules = (components, router, store, isServer, reqConfig) => {
+    return components
+        .filter((i) => typeof i.registerModule === 'function')
+        .forEach((component) => {
+        component.registerModule({
+            route: router.currentRoute,
+            store,
+            router,
+            isServer,
+            reqConfig,
+        });
+    });
+};
+// prefetch data hook
+const prefetchData = (components, router, store, isServer) => {
+    const asyncDatas = components.filter((i) => typeof i.asyncData === 'function');
+    return Promise.all(asyncDatas.map((i) => {
+        return i.asyncData({
+            route: router.currentRoute.value,
+            store,
+            router,
+            isServer,
+        });
+    }));
+};
+// ssr custom hook
+const getAsyncData = (router, store, isServer, reqConfig) => {
+    return new Promise(async (resolve) => {
+        const { matched, fullPath, query } = router.currentRoute.value;
+        // current components
+        const components = matched.map((i) => {
+            return i.components.default;
+        });
+        // register store module
+        registerModules(components, router, store, isServer, reqConfig);
+        const { pd } = query;
+        const isServerPage = store.ssrPath === fullPath;
+        // prefetch data
+        if ((isServer && Number(pd)) || (!isServer && !isServerPage)) {
+            await prefetchData(components, router, store, isServer);
+        }
+        !isServer && store.ssrPath && store.$setSsrPath('');
+        resolve();
+    });
+};
+
 const getUserMiddleware = () => {
     return config.getDirFiles('middleware').map(i => {
         return config.resolveModule(`./middleware/${i}`);
     });
 };
 class Server {
-    constructor(ssr) {
-        this.ssr = ssr;
+    constructor(render) {
+        this.render = render;
         this.app = express__default();
         this.middleware();
         this.listen();
     }
     async middleware() {
-        const { app } = this;
+        const { app, render } = this;
+        // custom middleware
         getUserMiddleware().forEach(mid => mid(app));
-        if (!this.ssr.isBuild) {
-            app.use(this.ssr.devServer.middlewares);
+        if (!render.ssr.isBuild) {
+            if (!this.render.devServer)
+                return;
+            app.use(this.render.devServer.middlewares);
         }
         else {
             app.use(require("compression")());
@@ -131,8 +183,11 @@ class Server {
     }
     registerRoute() {
         this.app.use("*", async (req, res) => {
+            if (req.method.toLocaleLowerCase() !== 'get' || req.originalUrl === '/favicon.ico')
+                return;
+            console.log('当前ssr路径', req.method, req.originalUrl);
             try {
-                const html = await this.ssr._render(req);
+                const html = await this.render.renderHtml(req);
                 // 禁用send的弱缓存
                 res
                     .status(200)
@@ -143,7 +198,7 @@ class Server {
                     .send(html);
             }
             catch (e) {
-                const { devServer } = this.ssr;
+                const { devServer } = this.render;
                 devServer && devServer.ssrFixStacktrace(e);
                 console.log(e.stack);
                 res.status(500).end(e.stack);
@@ -151,8 +206,8 @@ class Server {
         });
     }
     listen() {
-        const { app, ssr } = this;
-        const { port = 3000 } = ssr.config;
+        const { app, render } = this;
+        const { port = 3000 } = render.ssr.config;
         return app.listen(port, () => {
             console.log(`http://localhost:${port}`);
             console.log(`http://${require("ip").address()}:${port}`);
@@ -160,11 +215,78 @@ class Server {
     }
 }
 
-const renderHtml = async (app, manifest) => {
-    // 生成html字符串
+const serialize = require("serialize-javascript");
+class Render {
+    constructor(ssr) {
+        this.devServer = null;
+        this.ssr = ssr;
+        this.init();
+    }
+    async init() {
+        const { isBuild, buildOptions } = this.ssr;
+        if (!isBuild) {
+            this.devServer = await vite.createServer({
+                root: process.cwd(),
+                mode: process.env.NODE_ENV,
+                logLevel: "info",
+                server: {
+                    middlewareMode: true,
+                },
+                ...buildOptions
+            });
+        }
+        new Server(this);
+    }
+    async renderHtml(req) {
+        const url = req.originalUrl;
+        const { isBuild } = this.ssr;
+        let template = '';
+        let render;
+        if (!isBuild) {
+            if (!this.devServer)
+                return;
+            const { transformIndexHtml, ssrLoadModule } = this.devServer;
+            template = config.getTemplate("index.html");
+            template = await transformIndexHtml(url, template);
+            render = (await ssrLoadModule(`/${config.getServerEntry()}`)).render;
+        }
+        else {
+            template = config.getTemplate("dist/client/index.html");
+            render = require(config.resolve("dist/server/entry-server.js")).render;
+        }
+        const main = await Promise.resolve(render(req.query));
+        const { app, store } = main;
+        await serverRender(req, main);
+        const { rootHtml, preloadLinks } = await renderRootHtml(app, isBuild ? require(config.resolve("dist/client/ssr-manifest.json")) : {});
+        // 读取配置文件，注入给客户端
+        const baseConfig = dotenv__default.config({ path: config.resolve('.env') }).parsed;
+        const config$1 = dotenv__default.config({ path: config.resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
+        const state = "<script>window.__INIT_STATE__=" +
+            serialize(store, { isJSON: true }) + ";" +
+            'window.__APP_CONFIG__=' + serialize({ ...baseConfig, ...config$1 }, { isJSON: true }) +
+            "</script>";
+        const html = template
+            .replace(`<!--preload-links-->`, preloadLinks)
+            .replace(`<!--app-html-->`, rootHtml)
+            .replace(`<!--app-store-->`, state);
+        return html;
+    }
+}
+const serverRender = async (req, main) => {
+    const { router, store } = main;
+    const { originalUrl, query } = req;
+    // sync url
+    router.push(originalUrl);
+    await router.isReady();
+    const { pd } = router.currentRoute.value.query;
+    Number(pd) && store.$setSsrPath(originalUrl);
+    await getAsyncData(router, store, true, query);
+};
+const renderRootHtml = async (app, manifest) => {
     const ctx = {};
+    // render vue to html
     const rootHtml = await serverRenderer.renderToString(app, ctx);
-    // 生成资源预取数组
+    // get preload source
     const preloadLinks = ctx.modules
         ? renderPreloadLinks(ctx.modules, manifest)
         : "";
@@ -214,61 +336,17 @@ const renderPreloadLink = (file) => {
     }
 };
 
-const serialize = require("serialize-javascript");
 class SSR {
     constructor({ buildOptions, runType, config }) {
-        this.template = "";
         this.isBuild = false;
         this.isBuild = runType === "build";
         this.setEnv(runType);
         this.buildOptions = buildOptions;
         this.config = config;
-        this.createServer();
+        new Render(this);
     }
     setEnv(runType) {
         process.env.NXXT_RUN_TYPE = runType || "dev";
-    }
-    async createServer() {
-        if (!this.isBuild) {
-            this.devServer = await vite.createServer({
-                root: process.cwd(),
-                mode: process.env.NODE_ENV,
-                logLevel: "info",
-                server: {
-                    middlewareMode: true,
-                },
-                ...this.buildOptions
-            });
-        }
-        this.app = new Server(this);
-    }
-    async _render(req) {
-        const url = req.originalUrl;
-        if (!this.isBuild) {
-            const { transformIndexHtml, ssrLoadModule } = this.devServer;
-            const template = config.getTemplate("index.html");
-            this.template = await transformIndexHtml(url, template);
-            this.render = (await ssrLoadModule(`/${config.getServerEntry()}`)).render;
-        }
-        else {
-            this.template = config.getTemplate("dist/client/index.html");
-            this.render = require(config.resolve("dist/server/entry-server.js")).render;
-        }
-        const { app, store } = await this.render(url, req.query);
-        const { rootHtml, preloadLinks } = await renderHtml(app, this.isBuild ? require(config.resolve("dist/client/ssr-manifest.json")) : {});
-        // 读取配置文件，注入给客户端
-        // const config = require('dotenv').config({ path: resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
-        // console.log('读取到的配置', process.env.NODE_ENV, config);
-        const state = "<script>window.__INIT_STATE__=" +
-            serialize(store, { isJSON: true }) +
-            ";" +
-            // 'window.__APP_CONFIG__=' + serialize(config, { isJSON: true }) +
-            "</script>";
-        const html = this.template
-            .replace(`<!--preload-links-->`, preloadLinks)
-            .replace(`<!--app-html-->`, rootHtml)
-            .replace(`<!--app-store-->`, state);
-        return html;
     }
 }
 

@@ -6,6 +6,8 @@ const cwd = process.cwd();
 
 export const resolveModule = (p: string) => jiti(path.resolve(cwd))(p).default;
 
+export const resolveVueTemplate = (p: string, n: string) => jiti(p)(n);
+
 export const resolve = (p: string) => path.resolve(process.cwd(), p);
 
 export const getTemplate = (p: string) => fs.readFileSync(resolve(p), "utf-8");

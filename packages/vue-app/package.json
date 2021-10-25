@@ -2,7 +2,7 @@
   "name": "@nxxt/vue-app",
   "version": "1.0.0",
   "license": "MIT",
-  "main": "dist/vue-app.js",
+  "main": "dist/index.js",
   "typings": "index.d.ts",
   "files": [
     "dist",
@@ -12,7 +12,13 @@
     "index.d.ts"
   ],
   "dependencies": {
+    "@wefly/vue-store-next": "^1.0.1",
+    "vue": "3.1.5",
     "vue-router": "4.0.10"
+  },
+  "devDependencies": {
+    "@vue/runtime-core": "^3.2.20",
+    "vite": "2.4.1"
   },
   "publishConfig": {
     "access": "public"

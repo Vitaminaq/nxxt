@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from "express";
-import { SSR } from "./ssr";
+import { Render } from "./render";
 import { resolve, getDirFiles, resolveModule } from "../utils";
 
 const getUserMiddleware = () => {
@@ -9,23 +9,25 @@ const getUserMiddleware = () => {
 }
 
 export class Server {
-  public ssr: SSR;
+  public render: Render;
   public app: Express;
 
-  public constructor(ssr: SSR) {
-    this.ssr = ssr;
+  public constructor(render: Render) {
+    this.render = render;
     this.app = express();
     this.middleware();
     this.listen();
   }
 
   public async middleware() {
-    const { app } = this;
+    const { app, render } = this;
 
+    // custom middleware
     getUserMiddleware().forEach(mid => mid(app));
     
-    if (!this.ssr.isBuild) {
-      app.use(this.ssr.devServer.middlewares);
+    if (!render.ssr.isBuild) {
+      if (!this.render.devServer) return;
+      app.use(this.render.devServer.middlewares);
     } else {
       app.use(require("compression")());
       app.use(
@@ -50,8 +52,11 @@ export class Server {
 
   public registerRoute() {
     this.app.use("*", async (req: Request, res: Response) => {
+      if (req.method.toLocaleLowerCase() !== 'get' || req.originalUrl === '/favicon.ico')
+        return;
+      console.log('当前ssr路径', req.method, req.originalUrl);
       try {
-        const html = await this.ssr._render(req);
+        const html = await this.render.renderHtml(req);
         // 禁用send的弱缓存
         res
           .status(200)
@@ -61,7 +66,7 @@ export class Server {
           })
           .send(html);
       } catch (e: any) {
-        const { devServer } = this.ssr;
+        const { devServer } = this.render;
         devServer && devServer.ssrFixStacktrace(e);
         console.log(e.stack);
         res.status(500).end(e.stack);
@@ -70,8 +75,8 @@ export class Server {
   }
 
   public listen() {
-    const { app, ssr } = this;
-    const { port = 3000 } = ssr.config;
+    const { app, render } = this;
+    const { port = 3000 } = render.ssr.config;
     return app.listen(port, () => {
       console.log(`http://localhost:${port}`);
       console.log(`http://${require("ip").address()}:${port}`);

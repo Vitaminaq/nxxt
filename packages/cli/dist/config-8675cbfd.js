@@ -27,6 +27,7 @@ const getDirFiles = (folderName) => {
     return fs__default.readdirSync(path);
 };
 
+// import { template as vueTemplate } from '@nxxt/vue-app';
 const defaultNxxtConfigFile = "nxxt.config";
 const defineNxxtConfig = (options) => {
     return options;
@@ -38,6 +39,7 @@ const getNxxtConfig = () => {
 };
 const getServerEntry = () => {
     return getTypeFile("src/entry-server");
+    // resolveVueTemplate(vueTemplate.dir, './entry-server.ts');
 };
 const getClientEntry = () => {
     return getTypeFile("src/entry-client");
@@ -49,7 +51,7 @@ const mergeNxxtConfig = (inlineConfig) => {
     const mode = inlineConfig.mode || nxxtConfig.mode || "production";
     process.env.NODE_ENV = mode;
     buildConfig.mode = mode;
-    viteOptions = vite.mergeConfig(viteOptions, buildConfig);
+    viteOptions = vite.mergeConfig(viteOptions || {}, buildConfig);
     serverEntry = serverEntry || getServerEntry() || '';
     return {
         ...nxxtConfig,

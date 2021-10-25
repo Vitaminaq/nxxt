@@ -1,27 +1,21 @@
 import { Main } from './main';
-import VueRescroll from '@wefly/vue-rescroll';
-import VueImageLazyLoad from '@wefly/vue-image-lazy-load';
-import { getRealUrl, getAsyncData } from '@/services/publics';
-import { getStateFromNative, getSyncWxState } from '@/services/native';
-import Popup from '@/components/popup';
-import { getSyncAppState, setNativeTitle } from '@/utils/native-methods';
-import { setCookies } from '@/utils/cookies';
-
+// import { getAsyncData } from './config';
 class EntryClient extends Main {
 	public constructor() {
 		super();
 		this.initState();
 	}
 	public async initState() {
-		replaceStore(this.store);
+		// replaceStore(this.store);
 	}
 
 	// 注册路由钩子
 	public registerRouterHook() {
 		this.router.afterEach(() => {
-			const { router, store } = this;
-			getAsyncData(router, store, false);
-			window.$getPageData = () => getAsyncData(router, store, false);
+			console.log('数据预取');
+			// const { router, store } = this;
+			// getAsyncData(router, store, false);
+			// window.$getPageData = () => getAsyncData(router, store, false);
 		});
 	}
 

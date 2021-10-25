@@ -6,6 +6,7 @@ import {
 } from "vite";
 import { Options } from "vite-plugin-pwa";
 import { getTypeFile, resolveModule } from "./utils";
+// import { template as vueTemplate } from '@nxxt/vue-app';
 
 export const defaultNxxtConfigFile = "nxxt.config";
 
@@ -50,6 +51,7 @@ export const getNxxtConfig = (): NxxtUserConfig => {
 
 export const getServerEntry = () => {
   return getTypeFile("src/entry-server");
+  // resolveVueTemplate(vueTemplate.dir, './entry-server.ts');
 };
 
 export const getClientEntry = (): string => {
@@ -66,7 +68,7 @@ export const mergeNxxtConfig = (inlineConfig: InlineConfig): NxxtUserConfig => {
   process.env.NODE_ENV = mode;
   buildConfig.mode = mode;
 
-  viteOptions = mergeConfig(viteOptions, buildConfig);
+  viteOptions = mergeConfig(viteOptions || {}, buildConfig);
 
   serverEntry = serverEntry || getServerEntry() || '';
 

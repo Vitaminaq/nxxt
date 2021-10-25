@@ -1,10 +1,10 @@
 /// <reference types="node" />
 import { Express } from "express";
-import { SSR } from "./ssr";
+import { Render } from "./render";
 export declare class Server {
-    ssr: SSR;
+    render: Render;
     app: Express;
-    constructor(ssr: SSR);
+    constructor(render: Render);
     middleware(): Promise<void>;
     registerRoute(): void;
     listen(): import("http").Server;

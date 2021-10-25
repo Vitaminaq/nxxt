@@ -2,16 +2,16 @@
   "name": "ssr-demo",
   "version": "1.0.0",
   "scripts": {
-    "server": "nxxt",
+    "server": "nxxt --mode development",
     "build": "nxxt build",
     "start": "nxxt start"
   },
   "dependencies": {
+    "@vue/server-renderer": "3.1.5",
     "@wefly/vue-image-lazy-load": "^1.0.0",
     "@wefly/vue-rescroll": "^1.0.1",
     "@wefly/vue-store-next": "^1.0.1",
     "@wefly/vue-virtual-scroller": "^1.0.5",
-    "@vue/server-renderer": "3.1.5",
     "axios": "^0.21.0",
     "cross-env": "^7.0.3",
     "js-cookie": "^2.2.1",
@@ -25,6 +25,7 @@
     "@typescript-eslint/parser": "^4.13.0",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^7.0.0",
+    "@vue/runtime-core": "^3.2.20",
     "chalk": "^4.1.0",
     "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",
