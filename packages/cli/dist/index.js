@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var config = require('./config-8675cbfd.js');
+var hook = require('./hook-269f8629.js');
 var vite = require('vite');
 require('path');
 require('fs');
@@ -10,16 +10,17 @@ require('jiti');
 
 
 
-exports.defaultNxxtConfigFile = config.defaultNxxtConfigFile;
-exports.defineNxxtConfig = config.defineNxxtConfig;
-exports.getClientEntry = config.getClientEntry;
-exports.getNxxtConfig = config.getNxxtConfig;
-exports.getServerEntry = config.getServerEntry;
-exports.getSsrTransformCustomDir = config.getSsrTransformCustomDir;
-exports.mergeCompilerOptions = config.mergeCompilerOptions;
-exports.mergeNxxtConfig = config.mergeNxxtConfig;
-exports.mergePwa = config.mergePwa;
-exports.mergePxToRem = config.mergePxToRem;
+exports.defaultNxxtConfigFile = hook.defaultNxxtConfigFile;
+exports.defineNxxtConfig = hook.defineNxxtConfig;
+exports.getAsyncData = hook.getAsyncData;
+exports.getClientEntry = hook.getClientEntry;
+exports.getNxxtConfig = hook.getNxxtConfig;
+exports.getServerEntry = hook.getServerEntry;
+exports.getSsrTransformCustomDir = hook.getSsrTransformCustomDir;
+exports.mergeCompilerOptions = hook.mergeCompilerOptions;
+exports.mergeNxxtConfig = hook.mergeNxxtConfig;
+exports.mergePwa = hook.mergePwa;
+exports.mergePxToRem = hook.mergePxToRem;
 for (var k in vite) {
 	if (k !== 'default' && !exports.hasOwnProperty(k)) exports[k] = vite[k];
 }

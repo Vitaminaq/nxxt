@@ -1,11 +1,12 @@
 import { Main } from './main';
 import VueRescroll from '@wefly/vue-rescroll';
 import VueImageLazyLoad from '@wefly/vue-image-lazy-load';
-import { getRealUrl, getAsyncData } from '@/services/publics';
+import { getRealUrl } from '@/services/publics';
 import { getStateFromNative, getSyncWxState } from '@/services/native';
 import Popup from '@/components/popup';
 import { getSyncAppState, setNativeTitle } from '@/utils/native-methods';
 import { setCookies } from '@/utils/cookies';
+import { getAsyncData } from 'nxxt';
 
 class EntryClient extends Main {
 	public constructor() {

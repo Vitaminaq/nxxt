@@ -2,7 +2,7 @@
 
 var cac = require('cac');
 var vite = require('vite');
-var config = require('./config-8675cbfd.js');
+var hook = require('./hook-269f8629.js');
 var vue = require('@vitejs/plugin-vue');
 var vueJsx = require('@vitejs/plugin-vue-jsx');
 var vueLegacy = require('@vitejs/plugin-legacy');
@@ -31,7 +31,7 @@ const getBaseOptions = (options) => {
         ...plugins,
         vue__default({
             template: {
-                compilerOptions: compilerOptions ? config.mergeCompilerOptions(compilerOptions) : {}
+                compilerOptions: compilerOptions ? hook.mergeCompilerOptions(compilerOptions) : {}
             }
         })
     ];
@@ -39,7 +39,7 @@ const getBaseOptions = (options) => {
         targets: ['defaults'],
     }));
     jsx && plugins.push(vueJsx__default());
-    pwa && plugins.push(vitePluginPwa.VitePWA(config.mergePwa(pwa)));
+    pwa && plugins.push(vitePluginPwa.VitePWA(hook.mergePwa(pwa)));
     baseOptions.plugins = plugins;
     baseOptions.resolve = {
         ...resolve,
@@ -53,7 +53,7 @@ const getBaseOptions = (options) => {
         ...css,
         postcss: {
             plugins: [
-                require('postcss-pxtorem')(config.mergePxToRem(pxToRem)),
+                require('postcss-pxtorem')(hook.mergePxToRem(pxToRem)),
             ],
         },
     });
@@ -96,56 +96,9 @@ const getBaseBuildConfig = (customConfig) => {
     };
 };
 
-// register store modules hook
-const registerModules = (components, router, store, isServer, reqConfig) => {
-    return components
-        .filter((i) => typeof i.registerModule === 'function')
-        .forEach((component) => {
-        component.registerModule({
-            route: router.currentRoute,
-            store,
-            router,
-            isServer,
-            reqConfig,
-        });
-    });
-};
-// prefetch data hook
-const prefetchData = (components, router, store, isServer) => {
-    const asyncDatas = components.filter((i) => typeof i.asyncData === 'function');
-    return Promise.all(asyncDatas.map((i) => {
-        return i.asyncData({
-            route: router.currentRoute.value,
-            store,
-            router,
-            isServer,
-        });
-    }));
-};
-// ssr custom hook
-const getAsyncData = (router, store, isServer, reqConfig) => {
-    return new Promise(async (resolve) => {
-        const { matched, fullPath, query } = router.currentRoute.value;
-        // current components
-        const components = matched.map((i) => {
-            return i.components.default;
-        });
-        // register store module
-        registerModules(components, router, store, isServer, reqConfig);
-        const { pd } = query;
-        const isServerPage = store.ssrPath === fullPath;
-        // prefetch data
-        if ((isServer && Number(pd)) || (!isServer && !isServerPage)) {
-            await prefetchData(components, router, store, isServer);
-        }
-        !isServer && store.ssrPath && store.$setSsrPath('');
-        resolve();
-    });
-};
-
 const getUserMiddleware = () => {
-    return config.getDirFiles('middleware').map(i => {
-        return config.resolveModule(`./middleware/${i}`);
+    return hook.getDirFiles('middleware').map(i => {
+        return hook.resolveModule(`./middleware/${i}`);
     });
 };
 class Server {
@@ -166,7 +119,7 @@ class Server {
         }
         else {
             app.use(require("compression")());
-            app.use(require("serve-static")(config.resolve("dist/client"), {
+            app.use(require("serve-static")(hook.resolve("dist/client"), {
                 index: false,
                 setHeaders: (res) => {
                     res.setHeader("Cache-Control", "public,max-age=31536000");
@@ -246,24 +199,24 @@ class Render {
             if (!this.devServer)
                 return;
             const { transformIndexHtml, ssrLoadModule } = this.devServer;
-            template = config.getTemplate("index.html");
+            template = hook.getTemplate("index.html");
             template = await transformIndexHtml(url, template);
-            render = (await ssrLoadModule(`/${config.getServerEntry()}`)).render;
+            render = (await ssrLoadModule(`/${hook.getServerEntry()}`)).render;
         }
         else {
-            template = config.getTemplate("dist/client/index.html");
-            render = require(config.resolve("dist/server/entry-server.js")).render;
+            template = hook.getTemplate("dist/client/index.html");
+            render = require(hook.resolve("dist/server/entry-server.js")).render;
         }
         const main = await Promise.resolve(render(req.query));
         const { app, store } = main;
         await serverRender(req, main);
-        const { rootHtml, preloadLinks } = await renderRootHtml(app, isBuild ? require(config.resolve("dist/client/ssr-manifest.json")) : {});
+        const { rootHtml, preloadLinks } = await renderRootHtml(app, isBuild ? require(hook.resolve("dist/client/ssr-manifest.json")) : {});
         // 读取配置文件，注入给客户端
-        const baseConfig = dotenv__default.config({ path: config.resolve('.env') }).parsed;
-        const config$1 = dotenv__default.config({ path: config.resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
+        const baseConfig = dotenv__default.config({ path: hook.resolve('.env') }).parsed;
+        const config = dotenv__default.config({ path: hook.resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
         const state = "<script>window.__INIT_STATE__=" +
             serialize(store, { isJSON: true }) + ";" +
-            'window.__APP_CONFIG__=' + serialize({ ...baseConfig, ...config$1 }, { isJSON: true }) +
+            'window.__APP_CONFIG__=' + serialize({ ...baseConfig, ...config }, { isJSON: true }) +
             "</script>";
         const html = template
             .replace(`<!--preload-links-->`, preloadLinks)
@@ -280,7 +233,7 @@ const serverRender = async (req, main) => {
     await router.isReady();
     const { pd } = router.currentRoute.value.query;
     Number(pd) && store.$setSsrPath(originalUrl);
-    await getAsyncData(router, store, true, query);
+    await hook.getAsyncData(router, store, true, query);
 };
 const renderRootHtml = async (app, manifest) => {
     const ctx = {};
@@ -376,25 +329,25 @@ cli
     .command("[root]") // default command
     .alias("serve")
     .action((root, options) => {
-    const config$1 = config.mergeNxxtConfig({
+    const config = hook.mergeNxxtConfig({
         root,
         ...cleanOptions(options),
     });
-    const buildOptions = getClientOptions(config$1);
+    const buildOptions = getClientOptions(config);
     new SSR({
         buildOptions,
-        config: config$1
+        config
     });
 });
 // build
 cli
     .command("build [root]")
     .action(async (root, options) => {
-    const config$1 = config.mergeNxxtConfig({
+    const config = hook.mergeNxxtConfig({
         root,
         ...cleanOptions(options),
     });
-    const { clientOptions, serverOptions } = getBaseBuildConfig(config$1);
+    const { clientOptions, serverOptions } = getBaseBuildConfig(config);
     vite.build(clientOptions);
     vite.build(serverOptions);
 });
@@ -402,14 +355,14 @@ cli
 cli
     .command("start [root]")
     .action((root, options) => {
-    const config$1 = config.mergeNxxtConfig({
+    const config = hook.mergeNxxtConfig({
         root,
         ...cleanOptions(options),
     });
-    const buildOptions = getClientOptions(config$1);
+    const buildOptions = getClientOptions(config);
     new SSR({
         buildOptions,
-        config: config$1,
+        config,
         runType: "build",
     });
 });
