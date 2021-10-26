@@ -7,3 +7,7 @@
 进入packages/example/ssr demo项目
 
 npm run server 启动
+
+执行 node ./packages/create-nxxt/index 拉取模板文件，暂未完善
+
+也没发npm包，可先当仓库来先行开发
