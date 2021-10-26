@@ -9,7 +9,6 @@ export class BaseStore extends Store {
 
 	public constructor(reqConfig?: ReqConfig) {
 		super();
-		// 服务端会增加内存
 		// this.subscribe((event) => {
 		// 	this.subList.push(event);
 		// 	console.log('');
