@@ -1,15 +1,18 @@
-import { Router, RouteLocation } from 'vue-router';
-// import { BaseStore } from '@/store';
+import { Router } from 'vue-router';
 import { Component } from 'vue';
-import {} from '@vue/runtime-core';
 
-type BaseStore = any;
+// you can custom type
+type Store = {
+	ssrPath: string;
+	$setSsrPath: (p: string) => void;
+};
+type ReqConfig = {};
 
 // register store modules hook
 export const registerModules = (
 	components: Component[],
 	router: Router,
-	store: BaseStore,
+	store: Store,
 	isServer: boolean,
 	reqConfig?: ReqConfig
 ) => {
@@ -30,7 +33,7 @@ export const registerModules = (
 export const prefetchData = (
 	components: Component[],
 	router: Router,
-	store: BaseStore,
+	store: Store,
 	isServer: boolean
 ) => {
 	const asyncDatas: any[] = components.filter(
@@ -48,19 +51,10 @@ export const prefetchData = (
 	);
 };
 
-export interface ReqConfig {
-	v: string;
-	token: string;
-	platform: 'ios' | 'android' | 'mini';
-	channel: string;
-	vid: string;
-	app_id: string;
-}
-
 // ssr custom hook
 export const getAsyncData = (
 	router: Router,
-	store: BaseStore,
+	store: Store,
 	isServer: boolean,
 	reqConfig?: ReqConfig
 ): Promise<void> => {
@@ -88,32 +82,3 @@ export const getAsyncData = (
 		resolve();
 	});
 };
-
-export interface AsyncDataOption {
-	route: RouteLocation;
-	store: BaseStore;
-	router: Router;
-	isServer: boolean;
-	reqConfig?: ReqConfig;
-}
-
-export interface RegisterModuleOption extends AsyncDataOption {
-	reqConfig: ReqConfig;
-}
-
-declare module '@vue/runtime-core' {
-	export interface ComponentCustomOptions {
-		asyncData?: (option: AsyncDataOption) => void;
-		registerModule?: (option: RegisterModuleOption) => void;
-	}
-	export interface ComponentCustomProperties {
-		asyncData?: (option: AsyncDataOption) => void;
-		registerModule?: (option: RegisterModuleOption) => void;
-	}
-}
-
-declare global {
-	interface Window {
-		__INIT_STATE__: BaseStore;
-	}
-}

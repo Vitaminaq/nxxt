@@ -41,7 +41,7 @@ export const getStateFromNative = (
 			app.config.globalProperties.$popup.loading({
 				title: '状态同步中',
 				callback: () => {
-					store.user.userInfo.loadData();
+					// 更新用户信息 - 自行实现
 					return window.$getPageData();
 				},
 			});
@@ -90,8 +90,7 @@ export const getSyncWxState = (router: Router, app: App, store: BaseStore) => {
 				title: '状态同步中',
 				callback: () => {
 					if (token) {
-						// 更新用户信息
-						store.user.userInfo.loadData();
+						// 更新用户信息 - 自行实现
 					}
 					return window.$getPageData();
 				},

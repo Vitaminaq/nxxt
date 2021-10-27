@@ -179,5 +179,7 @@ exports.mergeCompilerOptions = mergeCompilerOptions;
 exports.mergeNxxtConfig = mergeNxxtConfig;
 exports.mergePwa = mergePwa;
 exports.mergePxToRem = mergePxToRem;
+exports.prefetchData = prefetchData;
+exports.registerModules = registerModules;
 exports.resolve = resolve;
 exports.resolveModule = resolveModule;

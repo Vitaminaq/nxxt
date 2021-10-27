@@ -27,7 +27,8 @@
       "scripthost"
     ],
     "types": [
-      "nxxt/types/client"
+      "nxxt/types/client",
+      "@nxxt/types"
     ]
   },
   "include": [

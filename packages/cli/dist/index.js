@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var hook = require('./hook-269f8629.js');
+var hook = require('./hook-80b78a8e.js');
 var vite = require('vite');
 require('path');
 require('fs');
@@ -21,6 +21,8 @@ exports.mergeCompilerOptions = hook.mergeCompilerOptions;
 exports.mergeNxxtConfig = hook.mergeNxxtConfig;
 exports.mergePwa = hook.mergePwa;
 exports.mergePxToRem = hook.mergePxToRem;
+exports.prefetchData = hook.prefetchData;
+exports.registerModules = hook.registerModules;
 for (var k in vite) {
 	if (k !== 'default' && !exports.hasOwnProperty(k)) exports[k] = vite[k];
 }

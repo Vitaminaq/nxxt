@@ -80,7 +80,7 @@ class EntryClient extends Main {
 		const { router } = this;
 		await router.isReady();
 		this.app.mount('#app');
-		window.nxxt = this;
+		window.kbb = this;
 	}
 }
 
@@ -88,7 +88,38 @@ new EntryClient();
 
 declare global {
 	interface Window {
-		nxxt: EntryClient;
+		kbb: EntryClient;
 		$getPageData: () => Promise<any>;
+		cloud: any; // 微信小程序云函数能力
+		c: any; // h5打开微信小程序
+		qq: {
+			maps: {
+				Geolocation: {
+					new (key: string, name: string): {
+						getLocation: (
+							success: (option: {
+								lat: number;
+								lng: number;
+							}) => void,
+							fail: (err: any) => void,
+							option: {
+								timeout: number;
+							}
+						) => void;
+					};
+				};
+			};
+		};
+		wx: {
+			config: any;
+			miniProgram: {
+				getEnv: (options: any) => void;
+				switchTab: ({ url }: { url: string }) => any;
+				reLaunch: ({ url }: { url: string }) => any;
+				redirectTo: ({ url }: { url: string }) => any;
+				navigateTo: ({ url }: { url: string }) => any;
+				navigateBack: ({ delta }: { delta: string }) => any;
+			};
+		};
 	}
 }

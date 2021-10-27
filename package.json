@@ -2,10 +2,10 @@
   "name": "nxxt-monorepo",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "!packages/example/*"
   ],
   "description": "Rendering scaffolding of server based on vite, Vue 3.0",
-  "types": "types/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Vitaminaq/nxxt.git",

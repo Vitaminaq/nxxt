@@ -1,6 +1,5 @@
-import { Router, RouteLocation } from 'vue-router';
+import { Router } from 'vue-router';
 import { BaseStore } from '@/store';
-import { Component } from 'vue';
 import { setCookies } from '@/utils/cookies';
 import { StateFromNativeResponse } from '@/services/native';
 
@@ -82,129 +81,18 @@ export const replaceStore = (store: BaseStore) => {
 	}
 };
 
-// 执行注册store钩子
-export const registerModules = (
-	components: Component[],
-	router: Router,
-	store: BaseStore,
-	isServer: boolean,
-	reqConfig?: ReqConfig
-) => {
-	return components
-		.filter((i: any) => typeof i.registerModule === 'function')
-		.forEach((component: any) => {
-			component.registerModule({
-				route: router.currentRoute,
-				store,
-				router,
-				isServer,
-				reqConfig,
-			});
-		});
-};
-
-// 预取数据
-export const prefetchData = (
-	components: Component[],
-	router: Router,
-	store: BaseStore,
-	isServer: boolean
-) => {
-	const asyncDatas: any[] = components.filter(
-		(i: any) => typeof i.asyncData === 'function'
-	);
-	return Promise.all(
-		asyncDatas.map((i) => {
-			return i.asyncData({
-				route: router.currentRoute.value,
-				store,
-				router,
-				isServer,
-			});
-		})
-	);
-};
-
 export interface ReqConfig {
-	v: string;
-	token: string;
-	platform: 'ios' | 'android' | 'mini';
-	channel: string;
-	vid: string;
-	app_id: string;
-}
-
-// ssr自定义钩子
-export const getAsyncData = (
-	router: Router,
-	store: BaseStore,
-	isServer: boolean,
-	reqConfig?: ReqConfig
-): Promise<void> => {
-	return new Promise(async (resolve) => {
-		const { matched, fullPath, query } = router.currentRoute.value;
-
-		// 当前组件
-		const components: Component[] = matched.map((i) => {
-			return i.components.default;
-		});
-		// 动态注册store
-		registerModules(components, router, store, isServer, reqConfig);
-
-		const { pd } = query;
-
-		// 是否为服务端渲染初始页面
-		const isServerPage = store.ssrPath === fullPath;
-
-		// 预取数据
-		if ((isServer && Number(pd)) || (!isServer && !isServerPage)) {
-			await prefetchData(components, router, store, isServer);
-		}
-		// 干掉预取数据标识
-		!isServer && store.ssrPath && store.$setSsrPath('');
-
-		resolve();
-	});
-};
-
-export interface AsyncDataOption {
-	route: RouteLocation;
-	store: BaseStore;
-	router: Router;
-	isServer: boolean;
-	reqConfig?: ReqConfig;
-}
-
-export interface RegisterModuleOption extends AsyncDataOption {
-	reqConfig: ReqConfig;
-}
-
-declare module '@vue/runtime-core' {
-	export interface ComponentCustomOptions {
-		asyncData?: (option: AsyncDataOption) => void;
-		registerModule?: (option: RegisterModuleOption) => void;
-	}
-	export interface ComponentCustomProperties {
-		asyncData?: (option: AsyncDataOption) => void;
-		registerModule?: (option: RegisterModuleOption) => void;
-	}
+	token?: string;
+	v?: string;
 }
 
 declare global {
 	interface Window {
-		$app_v: string;
 		__INIT_STATE__: BaseStore;
+		$app_v: string;
 		__APP_CONFIG__: {
 			VITE_BASE_URL: string;
 			VITE_BASE_H5_URL: string;
-			VITE_BASE_VIP: string;
-			VITE_BASE_DISTRIBUTION: string;
-			VITE_BASE_HOTEL: string;
-			VITE_BASE_TRAIN: string;
-			VITE_BASE_TAXI: string;
-			VITE_BASE_INVOICE: string;
-			VITE_BASE_FLIGHT: string;
-			VITE_BASE_TAKE_OUT: string;
 		};
 	}
 }

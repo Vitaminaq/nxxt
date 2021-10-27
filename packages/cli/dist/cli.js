@@ -2,7 +2,7 @@
 
 var cac = require('cac');
 var vite = require('vite');
-var hook = require('./hook-269f8629.js');
+var hook = require('./hook-80b78a8e.js');
 var vue = require('@vitejs/plugin-vue');
 var vueJsx = require('@vitejs/plugin-vue-jsx');
 var vueLegacy = require('@vitejs/plugin-legacy');

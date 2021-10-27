@@ -1,16 +1,16 @@
 import { RouterView } from 'vue-router';
-import { h, defineComponent } from 'vue';
-import { replaceStore, RegisterModuleOption } from '@/services/publics';
+import { h, defineComponent, ComponentOptionsWithoutProps } from 'vue';
+import { replaceStore } from '@/services/publics';
 import BaseStore from '@/store/index';
 
 // 动态注册store module
-export const baseRouteView = (storeModule: any) => {
-	const routeView = {
+export const baseRouteView = (storeModule: any): ComponentOptionsWithoutProps => {
+	return defineComponent({
 		name: 'BaseRouteView',
 		setup() {
 			return () => h(RouterView);
 		},
-		registerModule({ store, reqConfig }: RegisterModuleOption) {
+		registerModule({ store, reqConfig }) {
 			const name: keyof BaseStore = storeModule.default.moduleName;
 
 			// 接管服务端状态
@@ -19,8 +19,7 @@ export const baseRouteView = (storeModule: any) => {
 				replaceStore(store);
 			}
 		},
-	};
-	return routeView;
+	});
 };
 
 // 不需要动态注册时使用
