@@ -17,8 +17,8 @@ const handlerErrMsg = function (err: string, code: number) {
 	const [t, c] = err.split('||');
 	const title = c ? '' : t;
 	const content = c;
-	const { kbb } = window;
-	if (!kbb) return;
+	const { nxxt } = window;
+	if (!nxxt) return;
 	const option: AlertOptions = {
 		title,
 		content,
@@ -35,7 +35,7 @@ const handlerErrMsg = function (err: string, code: number) {
 			};
 			break;
 	}
-	kbb.app.config.globalProperties.$popup.alert(option);
+	nxxt.app.config.globalProperties.$popup.alert(option);
 };
 
 /**
@@ -104,12 +104,6 @@ class BaseAxios {
 				...getHeaderParams(this.reqConfig),
 			};
 			noHandleErrCode(config);
-
-			// if (typeof window !== 'undefined') {
-			// 	window.kbb.app.config.globalProperties.$popup.alert({
-			// 		content: JSON.stringify(config.headers),
-			// 	});
-			// }
 			return config;
 		});
 	}

@@ -34,38 +34,6 @@ export interface NativeMethodTypes {
 			platform: 'ios' | 'android' | 'mini';
 		}>;
 	};
-	// 去福利订单详情页
-	'10006': {
-		params: {
-			order_sn: string;
-		};
-		response: NativeResponse<any>;
-	};
-	// 去收银台
-	'10007': {
-		params: {
-			module:
-				| 'hotel' // 酒店
-				| 'takeOut' // 外卖
-				| 'flight' // 机票
-				| 'flightTrip' // 机票行程单
-				| 'tickFlight' // 机票改签
-				| 'taxi' // 打车
-				| 'petrol' // 加油
-				| 'train' // 火车
-				| 'member' // 会员
-				| 'welfare'; // 福利
-			orderSn: string;
-			vipPayType: 0 | 1;
-			price: number | string;
-		};
-		response: NativeResponse<any>;
-	};
-	// 去职场福利
-	'10008': {
-		params: any;
-		response: NativeResponse<any>;
-	};
 	// 主动设置原生导航栏标题
 	'10009': {
 		params: {

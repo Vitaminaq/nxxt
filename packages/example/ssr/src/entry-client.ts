@@ -90,5 +90,6 @@ declare global {
 	interface Window {
 		nxxt: EntryClient;
 		$getPageData: () => Promise<any>;
+		wx: any;
 	}
 }
