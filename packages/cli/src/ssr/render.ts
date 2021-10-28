@@ -92,7 +92,7 @@ export const serverRender = async (req: Request, main: any) => {
 	const { pd } = router.currentRoute.value.query;
 
 	Number(pd) && store.$setSsrPath(originalUrl);
-	await getAsyncData(router, store, true, query as any);
+	return getAsyncData(router, store, true, query as any);
 } 
 
 export const renderRootHtml = async (

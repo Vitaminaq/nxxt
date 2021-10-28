@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import { Render } from "./render";
-import { resolve, getDirFiles, resolveModule } from "../utils";
+import { resolve, getDirFiles, resolveModule, showBanner } from "../utils";
 
 const getUserMiddleware = () => {
   return getDirFiles('middleware').map(i => {
@@ -40,7 +40,7 @@ export class Server {
       );
       // 响应拦截
       app.use(
-        require("route-cache").cacheSeconds(60, (req: any) => {
+        require("route-cache").cacheSeconds(60, (req: Request) => {
           const { v, pd } = req.query;
           // 预取数据模式不做缓存
           return !Number(pd) && v && `${req.path}${v}`;
@@ -54,7 +54,6 @@ export class Server {
     this.app.use("*", async (req: Request, res: Response) => {
       if (req.method.toLocaleLowerCase() !== 'get' || req.originalUrl === '/favicon.ico')
         return;
-      console.log('当前ssr路径', req.method, req.originalUrl);
       try {
         const html = await this.render.renderHtml(req);
         // 禁用send的弱缓存
@@ -78,8 +77,7 @@ export class Server {
     const { app, render } = this;
     const { port = 3000 } = render.ssr.config;
     return app.listen(port, () => {
-      console.log(`http://localhost:${port}`);
-      console.log(`http://${require("ip").address()}:${port}`);
+      return showBanner(this);
     });
   }
 }

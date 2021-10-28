@@ -3,16 +3,15 @@ import VueRescroll from '@wefly/vue-rescroll';
 import VueImageLazyLoad from '@wefly/vue-image-lazy-load';
 import { getRealUrl } from '@/services/publics';
 import { getStateFromNative, getSyncWxState } from '@/services/native';
-import Popup from '@/components/popup';
 import { getSyncAppState, setNativeTitle } from '@/utils/native-methods';
 import { setCookies } from '@/utils/cookies';
-import { getAsyncData } from 'nxxt';
+// import { getAsyncData } from 'nxxt';
 
 class EntryClient extends Main {
 	public constructor() {
 		super();
 		// 注册组件
-		this.app.use(VueRescroll).use(VueImageLazyLoad).use(Popup);
+		this.app.use(VueRescroll).use(VueImageLazyLoad);
 		this.initState();
 	}
 	// 初始客户端状态
@@ -70,8 +69,8 @@ class EntryClient extends Main {
 		});
 		this.router.afterEach(() => {
 			const { router, store } = this;
-			getAsyncData(router, store, false);
-			window.$getPageData = () => getAsyncData(router, store, false);
+			// getAsyncData(router, store, false);
+			// window.$getPageData = () => getAsyncData(router, store, false);
 		});
 	}
 

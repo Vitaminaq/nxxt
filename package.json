@@ -2,8 +2,7 @@
   "name": "nxxt-monorepo",
   "private": true,
   "workspaces": [
-    "packages/*",
-    "!packages/example/*"
+    "packages/*"
   ],
   "description": "Rendering scaffolding of server based on vite, Vue 3.0",
   "repository": {

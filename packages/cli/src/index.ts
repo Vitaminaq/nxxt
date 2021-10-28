@@ -2,4 +2,4 @@ export * from './config';
 
 export * from 'vite';
 
-export * from './ssr/hook';
+export { getAsyncData } from './ssr/hook';

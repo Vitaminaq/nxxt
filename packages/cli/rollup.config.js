@@ -1,44 +1,67 @@
-import typescript from '@rollup/plugin-typescript'
-import babel from '@rollup/plugin-babel';
-// import commonjs from "@rollup/plugin-commonjs";
-// import resolve from '@rollup/plugin-node-resolve';
-import json from '@rollup/plugin-json';
-import clear from 'rollup-plugin-clear';
-import path from 'path';
+import typescript from "@rollup/plugin-typescript";
+import babel from "@rollup/plugin-babel";
+import clear from "rollup-plugin-clear";
+import path from "path";
 
-export default {
-    input: {
-      index: path.resolve(__dirname, 'src/index.ts'),
-      cli: path.resolve(__dirname, 'src/cli.ts')
-    },
+const build = ({ name, format, isClear }) => {
+  const plugins = [
+    typescript({
+      target: "es2019",
+      include: ["src/**/*.ts", "types/**"],
+      esModuleInterop: true,
+      // in production we use api-extractor for dts generation
+      // in development we need to rely on the rollup ts plugin
+      tsconfig: "tsconfig.base.json",
+      declaration: true,
+      declarationDir: path.resolve(__dirname, "dist/"),
+    }),
+    babel({
+      babelHelpers: "bundled",
+      presets: ["@babel/preset-env"],
+    })
+  ];
+  isClear && plugins.push(
+    clear({
+      targets: ["./dist"]
+    }),
+  );
+  return {
+    input: path.resolve(__dirname, `src/${name}.ts`),
     plugins: [
-        typescript({
-            target: 'es2019',
-            include: ['src/**/*.ts', 'types/**', 'node_modules/vite/client'],
-            esModuleInterop: true,
-            // in production we use api-extractor for dts generation
-            // in development we need to rely on the rollup ts plugin
-            tsconfig: 'tsconfig.base.json',
-            declaration: true,
-            declarationDir: path.resolve(__dirname, 'dist/')
-          }),
-        //   resolve(),
-        //   commonjs(),
-          json(),
-          babel({
-            babelHelpers: 'bundled',
-            presets: ["@babel/preset-env"]
-          }),
-          clear({
-            targets: [ './dist' ]
-          }),
+      typescript({
+        target: "es2019",
+        include: ["src/**/*.ts", "types/**"],
+        esModuleInterop: true,
+        // in production we use api-extractor for dts generation
+        // in development we need to rely on the rollup ts plugin
+        tsconfig: "tsconfig.base.json",
+        declaration: true,
+        declarationDir: path.resolve(__dirname, "dist/"),
+      }),
+      babel({
+        babelHelpers: "bundled",
+        presets: ["@babel/preset-env"],
+      }),
+      clear({
+        targets: ["./dist"],
+      }),
     ],
     output: {
-        dir: path.resolve(__dirname, 'dist'),
-        entryFileNames: `[name].js`,
-        exports: 'named',
-        format: 'cjs',
-        externalLiveBindings: false,
-        freeze: false,
+      dir: path.resolve(__dirname, "dist"),
+      entryFileNames: `[name].js`,
+      exports: "named",
+      format,
+      externalLiveBindings: false,
+      freeze: false,
     },
+  }
 }
+
+export default [{
+  name: 'cli',
+  format: 'cjs',
+  isClear: true
+}, {
+  name: 'index',
+  format: 'esm'
+}].map(build)

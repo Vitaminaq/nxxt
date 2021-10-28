@@ -16,4 +16,5 @@ export default defineNxxtConfig({
         propList: ['*']
     },
     pwa: true, // 是否开启pwa
+    legacy: true
 });

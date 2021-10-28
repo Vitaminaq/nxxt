@@ -6,7 +6,6 @@ import { config } from './config';
 import { getCookie, cookieKeys } from '@/utils/cookies';
 import { ReqConfig } from '@/services/publics';
 import { toLogin } from '@/utils/native-methods';
-import { AlertOptions } from '@/components/popup/wrap';
 
 /**
  * 处理统一错误code
@@ -14,28 +13,6 @@ import { AlertOptions } from '@/components/popup/wrap';
 const handlerErrMsg = function (err: string, code: number) {
 	if (typeof window === 'undefined') return;
 	if (!err) return;
-	const [t, c] = err.split('||');
-	const title = c ? '' : t;
-	const content = c;
-	const { nxxt } = window;
-	if (!nxxt) return;
-	const option: AlertOptions = {
-		title,
-		content,
-		confirmText: '知道了',
-		showCancel: false,
-	};
-	switch (code) {
-		case -1000:
-			option.confirmText = '去登录';
-			option.showCancel = true;
-			option.callback = ({ confirm }) => {
-				if (!confirm) return;
-				toLogin();
-			};
-			break;
-	}
-	nxxt.app.config.globalProperties.$popup.alert(option);
 };
 
 /**

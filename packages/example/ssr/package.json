@@ -7,6 +7,7 @@
     "start": "nxxt start"
   },
   "dependencies": {
+    "@vue/server-renderer": "3.1.5",
     "@wefly/vue-image-lazy-load": "^1.0.0",
     "@wefly/vue-rescroll": "^1.0.1",
     "@wefly/vue-store-next": "^1.0.1",
@@ -14,12 +15,11 @@
     "axios": "^0.21.0",
     "cross-env": "^7.0.3",
     "js-cookie": "^2.2.1",
-    "nxxt": "file:../../cli",
+    "nxxt": "workspace:^1.0.0",
     "vue": "3.1.5",
     "vue-router": "4.0.10"
   },
   "devDependencies": {
-    "@nxxt/types": "file:../../types",
     "@types/node": "^14.14.30",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",

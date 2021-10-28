@@ -65,7 +65,13 @@ export const mergeNxxtConfig = (inlineConfig: InlineConfig): NxxtUserConfig => {
   let { viteOptions, serverEntry } = nxxtConfig;
 
   const mode = inlineConfig.mode || nxxtConfig.mode || "production";
-  process.env.NODE_ENV = mode;
+
+  const { NODE_ENV } = process.env;
+
+  if (!NODE_ENV || NODE_ENV !== mode) {
+    process.env.NODE_ENV = mode;
+  }
+  
   buildConfig.mode = mode;
 
   viteOptions = mergeConfig(viteOptions || {}, buildConfig);
