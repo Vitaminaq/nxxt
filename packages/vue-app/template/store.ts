@@ -1,5 +1,4 @@
 import Store, { NotifyOptions } from '@wefly/vue-store-next';
-import {} from '@vue/runtime-core'
 
 export class BaseStore extends Store {
 	public subList: NotifyOptions[] = [];
@@ -17,9 +16,3 @@ export class BaseStore extends Store {
 }
 
 export default BaseStore;
-
-declare module '@vue/runtime-core' {
-	export interface ComponentCustomProperties {
-		$store: BaseStore;
-	}
-}

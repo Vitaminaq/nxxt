@@ -1,4 +1,4 @@
-import { defineNxxtConfig } from 'nxxt';
+import { defineNxxtConfig } from '@nxxt/cli';
 import path from 'path';
 
 export default defineNxxtConfig({

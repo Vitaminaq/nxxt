@@ -1,8 +1,8 @@
 import { renderToString } from "@vue/server-renderer";
 import { App, VNode, RendererNode, RendererElement } from "vue";
 import { Request } from "express";
-import { getTemplate, resolve } from "../utils";
-import { getAsyncData } from './hook';
+import { getTemplate, resolve, getDevTemplate } from "../utils";
+import { getAsyncData } from '@nxxt/hook';
 import { SSR } from "./ssr";
 import { Server } from './server';
 import { getServerEntry } from "../config";
@@ -20,10 +20,10 @@ export class Render {
   }
 
   public async init() {
-    const { isBuild, buildOptions } = this.ssr;
+    const { isBuild, buildOptions, config } = this.ssr;
     if (!isBuild) {
       this.devServer = await createServer({
-        root: process.cwd(),
+        root: config.root,
         mode: process.env.NODE_ENV,
         logLevel: "info",
         server: {
@@ -37,16 +37,17 @@ export class Render {
 
   public async renderHtml(req: Request) {
     const url = req.originalUrl;
-    const { isBuild } = this.ssr;
+    const { isBuild, config } = this.ssr;
     let template = '';
     let render;
 
     if (!isBuild) {
       if (!this.devServer) return;
+      const { defaultTemplateDir } = config;
       const { transformIndexHtml, ssrLoadModule } = this.devServer;
-      template = getTemplate("index.html");
+      template = getDevTemplate(defaultTemplateDir || '', "index.html");
       template = await transformIndexHtml(url, template);
-      render = (await ssrLoadModule(`/${getServerEntry()}`)).render;
+      render = (await ssrLoadModule( defaultTemplateDir ? '/entry-server.ts' : `/${getServerEntry()}`)).render;
     } else {
       template = getTemplate("dist/client/index.html");
       render = require(resolve("dist/server/entry-server.js")).render;
@@ -63,13 +64,13 @@ export class Render {
     );
 
     // 读取配置文件，注入给客户端
-    const baseConfig = dotenv.config({ path: resolve('.env') }).parsed;
-    const config = dotenv.config({ path: resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
+    const baseparsed = dotenv.config({ path: resolve('.env') }).parsed;
+    const parsed = dotenv.config({ path: resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
 
     const state =
       "<script>window.__INIT_STATE__=" +
       serialize(store, { isJSON: true }) + ";" +
-      'window.__APP_CONFIG__=' + serialize({ ...baseConfig, ...config }, { isJSON: true }) +
+      'window.__APP_CONFIG__=' + serialize({ ...baseparsed, ...parsed }, { isJSON: true }) +
       "</script>";
 
     const html = template

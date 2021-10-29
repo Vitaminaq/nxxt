@@ -2,166 +2,31 @@
 
 var cac = require('cac');
 var vite = require('vite');
-var path = require('path');
-var fs = require('fs');
-var jiti = require('jiti');
-var chalk = require('chalk');
-var prettyBytes = require('pretty-bytes');
-var boxen = require('boxen');
+var config = require('./config-062a82df.js');
 var vue = require('@vitejs/plugin-vue');
 var vueJsx = require('@vitejs/plugin-vue-jsx');
 var vueLegacy = require('@vitejs/plugin-legacy');
+var path = require('path');
 var vitePluginPwa = require('vite-plugin-pwa');
 var serverRenderer = require('@vue/server-renderer');
+var hook = require('@nxxt/hook');
 var express = require('express');
 var dotenv = require('dotenv');
+require('fs');
+require('jiti');
+require('chalk');
+require('pretty-bytes');
+require('boxen');
+require('@nxxt/vue-app');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e["default"] : e; }
 
-var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
-var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
-var jiti__default = /*#__PURE__*/_interopDefaultLegacy(jiti);
-var chalk__default = /*#__PURE__*/_interopDefaultLegacy(chalk);
-var prettyBytes__default = /*#__PURE__*/_interopDefaultLegacy(prettyBytes);
-var boxen__default = /*#__PURE__*/_interopDefaultLegacy(boxen);
 var vue__default = /*#__PURE__*/_interopDefaultLegacy(vue);
 var vueJsx__default = /*#__PURE__*/_interopDefaultLegacy(vueJsx);
 var vueLegacy__default = /*#__PURE__*/_interopDefaultLegacy(vueLegacy);
+var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
 var express__default = /*#__PURE__*/_interopDefaultLegacy(express);
 var dotenv__default = /*#__PURE__*/_interopDefaultLegacy(dotenv);
-
-const cwd = process.cwd();
-const resolveModule = (p) => jiti__default(path__default.resolve(cwd))(p).default;
-const resolve = (p) => path__default.resolve(process.cwd(), p);
-const getTemplate = (p) => fs__default.readFileSync(resolve(p), "utf-8");
-const fileTypes = ["js", "ts"];
-const getTypeFile = (p) => {
-    const fts = fileTypes.filter((t) => fs__default.existsSync(resolve(`${p}.${t}`)));
-    return fts.length ? `${p}.${fts[0]}` : null;
-};
-const getDirFiles = (folderName) => {
-    const path = resolve(folderName);
-    if (!fs__default.existsSync(path))
-        return [];
-    return fs__default.readdirSync(path);
-};
-function getMemoryUsage() {
-    // https://nodejs.org/api/process.html#process_process_memoryusage
-    const { heapUsed, rss } = process.memoryUsage();
-    return { heap: heapUsed, rss };
-}
-function getFormattedMemoryUsage() {
-    const { heap, rss } = getMemoryUsage();
-    return `Memory usage: ${chalk__default.bold(prettyBytes__default(heap))} (RSS: ${prettyBytes__default(rss)})`;
-}
-function showBanner(nxxt) {
-    const titleLines = [];
-    const messageLines = [];
-    const label = (name) => chalk__default.bold.cyan(`▸ ${name}:`);
-    titleLines.push(`${label('Environment')} ${process.env.NODE_ENV}`);
-    titleLines.push(`${label('Rendering')}   server-side`);
-    titleLines.push('\n' + getFormattedMemoryUsage());
-    const { render } = nxxt;
-    const { port = 3000 } = render.ssr.config;
-    messageLines.push(chalk__default.bold('\nListening to：'));
-    messageLines.push('  👉 ' + chalk__default.underline.blue(`http://localhost:${port}`));
-    messageLines.push('  👉 ' + chalk__default.underline.blue(`http://${require("ip").address()}:${port}`));
-    process.stdout.write(boxen__default([titleLines.join('\n'), messageLines.join('\n')].join('\n'), {
-        borderColor: 'green',
-        borderStyle: 'round',
-        padding: 1,
-        margin: 1
-    }));
-}
-
-// import { template as vueTemplate } from '@nxxt/vue-app';
-const defaultNxxtConfigFile = "nxxt.config";
-const getNxxtConfig = () => {
-    if (!getTypeFile(defaultNxxtConfigFile))
-        return {};
-    return resolveModule(`./${defaultNxxtConfigFile}`);
-};
-const getServerEntry = () => {
-    return getTypeFile("src/entry-server");
-    // resolveVueTemplate(vueTemplate.dir, './entry-server.ts');
-};
-const mergeNxxtConfig = (inlineConfig) => {
-    const buildConfig = inlineConfig;
-    const nxxtConfig = getNxxtConfig();
-    let { viteOptions, serverEntry } = nxxtConfig;
-    const mode = inlineConfig.mode || nxxtConfig.mode || "production";
-    const { NODE_ENV } = process.env;
-    if (!NODE_ENV || NODE_ENV !== mode) {
-        process.env.NODE_ENV = mode;
-    }
-    buildConfig.mode = mode;
-    viteOptions = vite.mergeConfig(viteOptions || {}, buildConfig);
-    serverEntry = serverEntry || getServerEntry() || '';
-    return {
-        ...nxxtConfig,
-        viteOptions,
-        serverEntry,
-    };
-};
-const getSsrTransformCustomDir = (runTime = false) => {
-    return () => {
-        return {
-            props: [],
-            needRuntime: runTime,
-        };
-    };
-};
-const mergeCompilerOptions = ({ runtimeDirective = [], customDirective = [], customElement = [], }) => {
-    const directiveTransforms = {};
-    runtimeDirective.forEach((r) => {
-        directiveTransforms[r] = getSsrTransformCustomDir(true);
-    });
-    customDirective.forEach((c) => {
-        directiveTransforms[c] = getSsrTransformCustomDir();
-    });
-    return {
-        directiveTransforms,
-        isCustomElement: (tag) => {
-            return customElement.includes(tag);
-        },
-    };
-};
-const mergePxToRem = (options) => {
-    if (typeof options === "boolean")
-        return {
-            rootValue: 37.5,
-            propList: ["*"],
-        };
-    return options;
-};
-const mergePwa = (options) => {
-    if (typeof options === "boolean")
-        return {
-            strategies: "generateSW",
-            manifest: {},
-            workbox: {
-                cacheId: "nxxt",
-                sourcemap: false,
-                globIgnores: ["node_modules/**", "*.js", "*.css"],
-                globPatterns: [],
-                runtimeCaching: [
-                    {
-                        urlPattern: /\/.*(\?|&)v=.*/,
-                        handler: "StaleWhileRevalidate",
-                    },
-                    {
-                        urlPattern: /\/api\/.*(\?|&)/,
-                        handler: "NetworkFirst",
-                    },
-                    {
-                        urlPattern: /\.(?:png|gif|jpg|jpeg|webp|svg)$/,
-                        handler: "StaleWhileRevalidate",
-                    },
-                ],
-            },
-        };
-    return options;
-};
 
 const getBaseOptions = (options) => {
     const { pwa, jsx, pxToRem, legacy, alias = {}, compilerOptions, viteOptions } = options;
@@ -171,7 +36,7 @@ const getBaseOptions = (options) => {
         ...plugins,
         vue__default({
             template: {
-                compilerOptions: compilerOptions ? mergeCompilerOptions(compilerOptions) : {}
+                compilerOptions: compilerOptions ? config.mergeCompilerOptions(compilerOptions) : {}
             }
         })
     ];
@@ -179,7 +44,7 @@ const getBaseOptions = (options) => {
         targets: ['defaults'],
     }));
     jsx && plugins.push(vueJsx__default());
-    pwa && plugins.push(vitePluginPwa.VitePWA(mergePwa(pwa)));
+    pwa && plugins.push(vitePluginPwa.VitePWA(config.mergePwa(pwa)));
     baseOptions.plugins = plugins;
     baseOptions.resolve = {
         ...resolve,
@@ -193,7 +58,7 @@ const getBaseOptions = (options) => {
         ...css,
         postcss: {
             plugins: [
-                require('postcss-pxtorem')(mergePxToRem(pxToRem)),
+                require('postcss-pxtorem')(config.mergePxToRem(pxToRem)),
             ],
         },
     });
@@ -236,56 +101,9 @@ const getBaseBuildConfig = (customConfig) => {
     };
 };
 
-// register store modules hook
-const registerModules = (components, router, store, isServer, reqConfig) => {
-    return components
-        .filter((i) => typeof i.registerModule === 'function')
-        .forEach((component) => {
-        component.registerModule({
-            route: router.currentRoute,
-            store,
-            router,
-            isServer,
-            reqConfig,
-        });
-    });
-};
-// prefetch data hook
-const prefetchData = (components, router, store, isServer) => {
-    const asyncDatas = components.filter((i) => typeof i.asyncData === 'function');
-    return Promise.all(asyncDatas.map((i) => {
-        return i.asyncData({
-            route: router.currentRoute.value,
-            store,
-            router,
-            isServer,
-        });
-    }));
-};
-// ssr custom hook
-const getAsyncData = (router, store, isServer, reqConfig) => {
-    return new Promise(async (resolve) => {
-        const { matched, fullPath, query } = router.currentRoute.value;
-        // current components
-        const components = matched.map((i) => {
-            return i.components.default;
-        });
-        // register store module
-        registerModules(components, router, store, isServer, reqConfig);
-        const { pd } = query;
-        const isServerPage = store.ssrPath === fullPath;
-        // prefetch data
-        if ((isServer && Number(pd)) || (!isServer && !isServerPage)) {
-            await prefetchData(components, router, store, isServer);
-        }
-        !isServer && store.ssrPath && store.$setSsrPath('');
-        resolve();
-    });
-};
-
 const getUserMiddleware = () => {
-    return getDirFiles('middleware').map(i => {
-        return resolveModule(`./middleware/${i}`);
+    return config.getDirFiles('middleware').map(i => {
+        return config.resolveModule(`./middleware/${i}`);
     });
 };
 class Server {
@@ -306,7 +124,7 @@ class Server {
         }
         else {
             app.use(require("compression")());
-            app.use(require("serve-static")(resolve("dist/client"), {
+            app.use(require("serve-static")(config.resolve("dist/client"), {
                 index: false,
                 setHeaders: (res) => {
                     res.setHeader("Cache-Control", "public,max-age=31536000");
@@ -348,7 +166,7 @@ class Server {
         const { app, render } = this;
         const { port = 3000 } = render.ssr.config;
         return app.listen(port, () => {
-            return showBanner(this);
+            return config.showBanner(this);
         });
     }
 }
@@ -361,10 +179,10 @@ class Render {
         this.init();
     }
     async init() {
-        const { isBuild, buildOptions } = this.ssr;
+        const { isBuild, buildOptions, config } = this.ssr;
         if (!isBuild) {
             this.devServer = await vite.createServer({
-                root: process.cwd(),
+                root: config.root,
                 mode: process.env.NODE_ENV,
                 logLevel: "info",
                 server: {
@@ -377,31 +195,32 @@ class Render {
     }
     async renderHtml(req) {
         const url = req.originalUrl;
-        const { isBuild } = this.ssr;
+        const { isBuild, config: config$1 } = this.ssr;
         let template = '';
         let render;
         if (!isBuild) {
             if (!this.devServer)
                 return;
+            const { defaultTemplateDir } = config$1;
             const { transformIndexHtml, ssrLoadModule } = this.devServer;
-            template = getTemplate("index.html");
+            template = config.getDevTemplate(defaultTemplateDir || '', "index.html");
             template = await transformIndexHtml(url, template);
-            render = (await ssrLoadModule(`/${getServerEntry()}`)).render;
+            render = (await ssrLoadModule(defaultTemplateDir ? '/entry-server.ts' : `/${config.getServerEntry()}`)).render;
         }
         else {
-            template = getTemplate("dist/client/index.html");
-            render = require(resolve("dist/server/entry-server.js")).render;
+            template = config.getTemplate("dist/client/index.html");
+            render = require(config.resolve("dist/server/entry-server.js")).render;
         }
         const main = await Promise.resolve(render(req.query));
         const { app, store } = main;
         await serverRender(req, main);
-        const { rootHtml, preloadLinks } = await renderRootHtml(app, isBuild ? require(resolve("dist/client/ssr-manifest.json")) : {});
+        const { rootHtml, preloadLinks } = await renderRootHtml(app, isBuild ? require(config.resolve("dist/client/ssr-manifest.json")) : {});
         // 读取配置文件，注入给客户端
-        const baseConfig = dotenv__default.config({ path: resolve('.env') }).parsed;
-        const config = dotenv__default.config({ path: resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
+        const baseparsed = dotenv__default.config({ path: config.resolve('.env') }).parsed;
+        const parsed = dotenv__default.config({ path: config.resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
         const state = "<script>window.__INIT_STATE__=" +
             serialize(store, { isJSON: true }) + ";" +
-            'window.__APP_CONFIG__=' + serialize({ ...baseConfig, ...config }, { isJSON: true }) +
+            'window.__APP_CONFIG__=' + serialize({ ...baseparsed, ...parsed }, { isJSON: true }) +
             "</script>";
         const html = template
             .replace(`<!--preload-links-->`, preloadLinks)
@@ -418,7 +237,7 @@ const serverRender = async (req, main) => {
     await router.isReady();
     const { pd } = router.currentRoute.value.query;
     Number(pd) && store.$setSsrPath(originalUrl);
-    return getAsyncData(router, store, true, query);
+    return hook.getAsyncData(router, store, true, query);
 };
 const renderRootHtml = async (app, manifest) => {
     const ctx = {};
@@ -514,25 +333,25 @@ cli
     .command("[root]") // default command
     .alias("serve")
     .action((root, options) => {
-    const config = mergeNxxtConfig({
+    const config$1 = config.mergeNxxtConfig({
         root,
         ...cleanOptions(options),
     });
-    const buildOptions = getClientOptions(config);
+    const buildOptions = getClientOptions(config$1);
     new SSR({
         buildOptions,
-        config
+        config: config$1
     });
 });
 // build
 cli
     .command("build [root]")
     .action(async (root, options) => {
-    const config = mergeNxxtConfig({
+    const config$1 = config.mergeNxxtConfig({
         root,
         ...cleanOptions(options),
     });
-    const { clientOptions, serverOptions } = getBaseBuildConfig(config);
+    const { clientOptions, serverOptions } = getBaseBuildConfig(config$1);
     vite.build(clientOptions);
     vite.build(serverOptions);
 });
@@ -540,14 +359,14 @@ cli
 cli
     .command("start [root]")
     .action((root, options) => {
-    const config = mergeNxxtConfig({
+    const config$1 = config.mergeNxxtConfig({
         root,
         ...cleanOptions(options),
     });
-    const buildOptions = getClientOptions(config);
+    const buildOptions = getClientOptions(config$1);
     new SSR({
         buildOptions,
-        config,
+        config: config$1,
         runType: "build",
     });
 });

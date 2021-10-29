@@ -5,7 +5,7 @@ import { getRealUrl } from '@/services/publics';
 import { getStateFromNative, getSyncWxState } from '@/services/native';
 import { getSyncAppState, setNativeTitle } from '@/utils/native-methods';
 import { setCookies } from '@/utils/cookies';
-// import { getAsyncData } from 'nxxt';
+import { getAsyncData } from '@nxxt/hook';
 
 class EntryClient extends Main {
 	public constructor() {
@@ -69,8 +69,8 @@ class EntryClient extends Main {
 		});
 		this.router.afterEach(() => {
 			const { router, store } = this;
-			// getAsyncData(router, store, false);
-			// window.$getPageData = () => getAsyncData(router, store, false);
+			getAsyncData(router, store, false);
+			window.$getPageData = () => getAsyncData(router, store, false);
 		});
 	}
 

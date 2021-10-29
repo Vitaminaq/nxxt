@@ -27,7 +27,7 @@
       "scripthost"
     ],
     "types": [
-      "nxxt/types/client",
+      "@nxxt/cli/types/client",
       "@nxxt/types"
     ]
   },

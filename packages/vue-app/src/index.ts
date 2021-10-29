@@ -1,9 +1,9 @@
-import path from 'path'
-import { dependencies } from '../package.json'
+import path from 'path';
+import { dependencies } from '../package.json';
 
 export const template = {
   dependencies,
-  dir: path.join('..', 'template'),
+  dir: path.join(__dirname, '..', 'template'),
   files: [
     'App.vue',
     'main.ts',

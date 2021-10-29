@@ -5,8 +5,8 @@ import {
   mergeConfig,
 } from "vite";
 import { Options } from "vite-plugin-pwa";
-import { getTypeFile, resolveModule } from "./utils";
-// import { template as vueTemplate } from '@nxxt/vue-app';
+import { getTypeFile, resolveModule, isExitFile, resolve } from "./utils";
+import { template as vueTemplate } from '@nxxt/vue-app';
 
 export const defaultNxxtConfigFile = "nxxt.config";
 
@@ -38,6 +38,7 @@ export interface NxxtUserConfig {
   pxToRem?: PxToRemOptions;
   pwa?: PwaOptions;
   viteOptions?: UserConfig;
+  defaultTemplateDir?: string;
 }
 
 export const defineNxxtConfig = (options: NxxtUserConfig): NxxtUserConfig => {
@@ -51,11 +52,6 @@ export const getNxxtConfig = (): NxxtUserConfig => {
 
 export const getServerEntry = () => {
   return getTypeFile("src/entry-server");
-  // resolveVueTemplate(vueTemplate.dir, './entry-server.ts');
-};
-
-export const getClientEntry = (): string => {
-  return getTypeFile("src/entry-client") as string;
 };
 
 export const mergeNxxtConfig = (inlineConfig: InlineConfig): NxxtUserConfig => {
@@ -74,14 +70,25 @@ export const mergeNxxtConfig = (inlineConfig: InlineConfig): NxxtUserConfig => {
   
   buildConfig.mode = mode;
 
-  viteOptions = mergeConfig(viteOptions || {}, buildConfig);
-
   serverEntry = serverEntry || getServerEntry() || '';
+
+  let defaultTemplateDir = '';
+
+  // custom index.html
+  if (!isExitFile('index.html')) {
+    const { dir } = vueTemplate;
+    buildConfig.root = dir;
+    defaultTemplateDir = dir;
+    serverEntry = resolve('entry-server.ts', dir);
+  }
+
+  viteOptions = mergeConfig(viteOptions || {}, buildConfig);
 
   return {
     ...nxxtConfig,
     viteOptions,
     serverEntry,
+    defaultTemplateDir
   };
 };
 

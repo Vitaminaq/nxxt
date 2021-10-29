@@ -24,11 +24,11 @@ export interface NxxtUserConfig {
     pxToRem?: PxToRemOptions;
     pwa?: PwaOptions;
     viteOptions?: UserConfig;
+    defaultTemplateDir?: string;
 }
 export declare const defineNxxtConfig: (options: NxxtUserConfig) => NxxtUserConfig;
 export declare const getNxxtConfig: () => NxxtUserConfig;
 export declare const getServerEntry: () => string | null;
-export declare const getClientEntry: () => string;
 export declare const mergeNxxtConfig: (inlineConfig: InlineConfig) => NxxtUserConfig;
 export declare const getSsrTransformCustomDir: (runTime?: boolean) => () => {
     props: never[];

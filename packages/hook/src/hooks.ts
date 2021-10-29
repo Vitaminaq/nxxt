@@ -9,13 +9,13 @@ type Store = {
 type ReqConfig = {};
 
 // register store modules hook
-export const registerModules = (
+export function registerModules (
 	components: Component[],
 	router: Router,
 	store: Store,
 	isServer: boolean,
 	reqConfig?: ReqConfig
-) => {
+) {
 	return components
 		.filter((i: any) => typeof i.registerModule === 'function')
 		.forEach((component: any) => {
@@ -30,12 +30,12 @@ export const registerModules = (
 };
 
 // prefetch data hook
-export const prefetchData = (
+export function prefetchData (
 	components: Component[],
 	router: Router,
 	store: Store,
 	isServer: boolean
-) => {
+) {
 	const asyncDatas: any[] = components.filter(
 		(i: any) => typeof i.asyncData === 'function'
 	);
@@ -52,12 +52,12 @@ export const prefetchData = (
 };
 
 // ssr custom hook
-export const getAsyncData = (
+export function getAsyncData (
 	router: Router,
 	store: Store,
 	isServer: boolean,
 	reqConfig?: ReqConfig
-): Promise<void> => {
+): Promise<void> {
 	return new Promise(async (resolve) => {
 		const { matched, fullPath, query } = router.currentRoute.value;
 

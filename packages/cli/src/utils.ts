@@ -11,9 +11,16 @@ export const resolveModule = (p: string) => jiti(path.resolve(cwd))(p).default;
 
 export const resolveVueTemplate = (p: string, n: string) => jiti(p)(n);
 
-export const resolve = (p: string) => path.resolve(process.cwd(), p);
+export const resolve = (p1: string, p?: string) => path.resolve(p || process.cwd(), p1);
+
+export const isExitFile = (n: string) => fs.existsSync(resolve(n));
 
 export const getTemplate = (p: string) => fs.readFileSync(resolve(p), "utf-8");
+
+export const getDevTemplate = (p: string, n: string) => {
+  if (p) return fs.readFileSync(path.resolve(p, n), "utf-8");
+  return getTemplate(n);
+}
 
 const fileTypes = ["js", "ts"];
 

@@ -1,0 +1,41 @@
+{
+  "name": "@nxxt/hook",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Vitaminaq",
+  "description": "nxxt-hook",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "index.d.ts",
+    "src"
+  ],
+  "engines": {
+    "node": ">=12.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vitaminaq/nxxt.git",
+    "directory": "packages/hook"
+  },
+  "bugs": {
+    "url": "https://github.com/Vitaminaq/nxxt/issues"
+  },
+  "homepage": "https://github.com/Vitaminaq/nxxt/tree/main/packages/hook#readme",
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.8",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-typescript": "^8.2.5",
+    "rollup": "^2.58.0",
+    "rollup-plugin-clear": "^2.0.7",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.3",
+    "vue": "3.1.5",
+    "vue-router": "4.0.10"
+  }
+}
