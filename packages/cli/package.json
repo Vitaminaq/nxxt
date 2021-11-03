@@ -5,10 +5,10 @@
   "author": "Vitaminaq",
   "description": "nxxt-cli",
   "bin": {
-    "nxxt": "bin/nxxt.js"
+    "nxxt": "bin/nxxt-cli.js"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
     "bin",

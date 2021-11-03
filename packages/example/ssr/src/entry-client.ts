@@ -5,7 +5,7 @@ import { getRealUrl } from '@/services/publics';
 import { getStateFromNative, getSyncWxState } from '@/services/native';
 import { getSyncAppState, setNativeTitle } from '@/utils/native-methods';
 import { setCookies } from '@/utils/cookies';
-import { getAsyncData } from '@nxxt/hook';
+import { getAsyncData } from 'nxxt';
 
 class EntryClient extends Main {
 	public constructor() {

@@ -9,7 +9,7 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
 	name: 'Home',
-	asyncData({ store }) {}
+	asyncData({}) {}
 });
 </script>
 <style lang="less">

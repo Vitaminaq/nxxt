@@ -1,3 +1,5 @@
-export { defineNxxtConfig, NxxtUserConfig } from './config';
+import { NxxtUserConfig } from './config';
 
-export * from 'vite';
+export const defineNxxtConfig = (options: NxxtUserConfig): NxxtUserConfig => {
+    return options;
+};

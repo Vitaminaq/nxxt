@@ -41,10 +41,6 @@ export interface NxxtUserConfig {
   defaultTemplateDir?: string;
 }
 
-export const defineNxxtConfig = (options: NxxtUserConfig): NxxtUserConfig => {
-  return options;
-};
-
 export const getNxxtConfig = (): NxxtUserConfig => {
   if (!getTypeFile(defaultNxxtConfigFile)) return {};
   return resolveModule(`./${defaultNxxtConfigFile}`);

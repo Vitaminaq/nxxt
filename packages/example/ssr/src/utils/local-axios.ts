@@ -5,7 +5,6 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { config } from './config';
 import { getCookie, cookieKeys } from '@/utils/cookies';
 import { ReqConfig } from '@/services/publics';
-import { toLogin } from '@/utils/native-methods';
 
 /**
  * 处理统一错误code

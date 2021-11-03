@@ -128,8 +128,6 @@ importers:
 
   packages/example/ssr:
     specifiers:
-      '@nxxt/cli': workspace:^1.0.0
-      '@nxxt/hook': workspace:^1.0.0
       '@nxxt/types': workspace:^1.0.0
       '@types/node': ^14.14.30
       '@typescript-eslint/eslint-plugin': ^4.13.0
@@ -151,12 +149,12 @@ importers:
       js-cookie: ^2.2.1
       less: ^4.1.1
       less-loader: ^8.0.0
+      nxxt: workspace:^1.0.0
       prettier: ^2.2.1
       shelljs: ^0.8.4
       vue: 3.1.5
       vue-router: 4.0.10
     dependencies:
-      '@nxxt/hook': link:../../hook
       '@vue/server-renderer': 3.1.5_vue@3.1.5
       '@wefly/vue-image-lazy-load': 1.0.0
       '@wefly/vue-rescroll': 1.0.1
@@ -165,10 +163,10 @@ importers:
       axios: 0.21.4
       cross-env: 7.0.3
       js-cookie: 2.2.1
+      nxxt: link:../../nxxt
       vue: 3.1.5
       vue-router: 4.0.10_vue@3.1.5
     devDependencies:
-      '@nxxt/cli': link:../../cli
       '@nxxt/types': link:../../types
       '@types/node': 14.17.27
       '@typescript-eslint/eslint-plugin': 4.33.0_2951ba233cd46bb4e0f2f0a3f7fe108e
@@ -209,9 +207,28 @@ importers:
 
   packages/nxxt:
     specifiers:
+      '@babel/core': ^7.15.8
       '@nxxt/cli': workspace:^1.0.0
+      '@nxxt/hook': workspace:^1.0.0
+      '@rollup/plugin-babel': ^5.3.0
+      '@rollup/plugin-commonjs': ^21.0.1
+      '@rollup/plugin-typescript': ^8.2.5
+      rollup: ^2.58.0
+      rollup-plugin-clear: ^2.0.7
+      tslib: ^2.3.1
+      typescript: ^4.4.3
     dependencies:
       '@nxxt/cli': link:../cli
+      '@nxxt/hook': link:../hook
+    devDependencies:
+      '@babel/core': 7.15.8
+      '@rollup/plugin-babel': 5.3.0_@babel+core@7.15.8+rollup@2.58.0
+      '@rollup/plugin-commonjs': 21.0.1_rollup@2.58.0
+      '@rollup/plugin-typescript': 8.3.0_11969cb7979bf76fd37eb17f863ea3c2
+      rollup: 2.58.0
+      rollup-plugin-clear: 2.0.7
+      tslib: 2.3.1
+      typescript: 4.4.4
 
   packages/types:
     specifiers:
@@ -1474,6 +1491,22 @@ packages:
       '@rollup/pluginutils': 3.1.0_rollup@2.58.0
       rollup: 2.58.0
 
+  /@rollup/plugin-commonjs/21.0.1_rollup@2.58.0:
+    resolution: {integrity: sha512-EA+g22lbNJ8p5kuZJUYyhhDK7WgJckW5g4pNN7n4mAFUM96VuwUnNT3xr2Db2iCZPI1pJPbGyfT5mS9T1dHfMg==}
+    engines: {node: '>= 8.0.0'}
+    peerDependencies:
+      rollup: ^2.38.3
+    dependencies:
+      '@rollup/pluginutils': 3.1.0_rollup@2.58.0
+      commondir: 1.0.1
+      estree-walker: 2.0.2
+      glob: 7.2.0
+      is-reference: 1.2.1
+      magic-string: 0.25.7
+      resolve: 1.20.0
+      rollup: 2.58.0
+    dev: true
+
   /@rollup/plugin-json/4.1.0_rollup@2.58.0:
     resolution: {integrity: sha512-yfLbTdNS6amI/2OpmbiBoW12vngr5NW2jCJVZSBEz+H5KfUJZ2M7sDjk0U6GOOdCWFVScShte29o9NezJ53TPw==}
     peerDependencies:
@@ -1567,7 +1600,6 @@ packages:
 
   /@types/estree/0.0.48:
     resolution: {integrity: sha512-LfZwXoGUDo0C3me81HXgkBg5CTQYb6xzEl+fNmbO4JdRiSKQ8A0GD1OBBvKAIsbCUgoyAty7m99GqqMQe784ew==}
-    dev: false
 
   /@types/express-serve-static-core/4.17.24:
     resolution: {integrity: sha512-3UJuW+Qxhzwjq3xhwXm2onQcFHn76frIYVbTu+kn24LFxI+dEhdfISDFovPB8VpEgW8oQCTpRuCe+0zJxB7NEA==}
@@ -2274,6 +2306,10 @@ packages:
     resolution: {integrity: sha512-6P6g0uetGpW/sdyUy/iQQCbFF0kWVMSIVSyYz7Zgjcgh8mgw8PQzDNZeyZ5DQ2gM7LBoZPHmnjz8rUthkBG5tw==}
     engines: {node: '>=4.0.0'}
     dev: false
+
+  /commondir/1.0.1:
+    resolution: {integrity: sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=}
+    dev: true
 
   /compare-func/2.0.0:
     resolution: {integrity: sha512-zHig5N+tPWARooBnb0Zx1MFcdfpyJrfTJ3Y5L+IFvUm8rM74hHz66z0gw0x4tijh5CorKkKUCnW82R2vmpeCRA==}
@@ -3534,6 +3570,12 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
+  /is-reference/1.2.1:
+    resolution: {integrity: sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==}
+    dependencies:
+      '@types/estree': 0.0.48
+    dev: true
+
   /is-regex/1.1.4:
     resolution: {integrity: sha512-kvRdxDsxZjhzUX07ZnLydzS1TU/TJlTUHHY4YLL87e37oUA49DfkLqgy+VjFocowy29cKvcSiu+kIv728jTTVg==}
     engines: {node: '>= 0.4'}
@@ -3843,7 +3885,6 @@ packages:
     resolution: {integrity: sha512-4CrMT5DOHTDk4HYDlzmwu4FVCcIYI8gauveasrdCu2IKIFOJ3f0v/8MDGJCDL9oD2ppz/Av1b0Nj345H9M+XIA==}
     dependencies:
       sourcemap-codec: 1.4.8
-    dev: false
 
   /make-dir/2.1.0:
     resolution: {integrity: sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==}
@@ -4794,7 +4835,6 @@ packages:
 
   /sourcemap-codec/1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
-    dev: false
 
   /spdx-correct/3.1.1:
     resolution: {integrity: sha512-cOYcUWwhCuHCXi49RhFRCyJEK3iPj1Ziz9DpViV3tbZOwXD49QzIN3MpOLJNxh2qwq2lJJZaKMVw9qNi4jTC0w==}
