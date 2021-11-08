@@ -1,7 +1,7 @@
-// import { defineNxxtConfig } from 'nxxt';
+import { defineNxxtConfig } from 'nxxt';
 import path from 'path';
 
-export default {
+export default defineNxxtConfig({
     port: 8090, // ssr服务器启动端口
     jsx: true, // 是否支持jsx语法
     compilerOptions: {
@@ -17,4 +17,4 @@ export default {
     },
     pwa: true, // 是否开启pwa
     legacy: true
-};
+});
