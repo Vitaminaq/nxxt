@@ -1,60 +1,30 @@
 import { renderToString } from "@vue/server-renderer";
+import { resolve } from 'pathe';
 import { App, VNode, RendererNode, RendererElement } from "vue";
-import { Request } from "express";
-import { getTemplate, resolve, getDevTemplate } from "../utils";
-import { getAsyncData } from '@nxxt/hook';
-import { SSR } from "./ssr";
-import { Server } from './server';
-import { getServerEntry } from "../config";
-import { createServer, ViteDevServer } from "vite";
-import dotenv from 'dotenv'
-const serialize = require("serialize-javascript");
+import type { Request } from "express";
+import { getTemplate, getDevTemplate } from "../utils/utils";
+import { isBuild } from '../utils/env';
+import { NpxtConfig } from '../utils/config';
 
-export class Render {
-  public ssr: SSR;
-  public devServer: ViteDevServer | null = null;
-
-  public constructor(ssr: SSR) {
-    this.ssr = ssr;
-    this.init();
-  }
-
-  public async init() {
-    const { isBuild, buildOptions, config } = this.ssr;
-    if (!isBuild) {
-      this.devServer = await createServer({
-        root: config.root,
-        mode: process.env.NODE_ENV,
-        logLevel: "info",
-        server: {
-          middlewareMode: true,
-        },
-        ...buildOptions
-      });
-    }
-    new Server(this);
-  }
-
-  public async renderHtml(req: Request) {
+export async function renderHtml(req: Request, { devServer }: NpxtConfig) {
+    // const serialize = require("serialize-javascript");
     const url = req.originalUrl;
-    const { isBuild, config } = this.ssr;
+    const build = isBuild();
     let template = '';
     let render;
 
-    if (!isBuild) {
-      if (!this.devServer) return;
-      const { defaultTemplateDir } = config;
-      const { transformIndexHtml, ssrLoadModule } = this.devServer;
-      template = getDevTemplate(defaultTemplateDir || '', "index.html");
+    if (!build) {
+      const { transformIndexHtml, ssrLoadModule } = devServer;
+      template = getDevTemplate('', "index.html");
       template = await transformIndexHtml(url, template);
-      render = (await ssrLoadModule( defaultTemplateDir ? '/entry-server.ts' : `/${getServerEntry()}`)).render;
+      render = (await ssrLoadModule('/entry-server.ts')).render;
     } else {
       template = getTemplate("dist/client/index.html");
       render = require(resolve("dist/server/entry-server.js")).render;
     }
     const main = await Promise.resolve(render(req.query));
 
-    const { app, store } = main;
+    const { app } = main;
 
     await serverRender(req, main);
 
@@ -63,25 +33,14 @@ export class Render {
       isBuild ? require(resolve("dist/client/ssr-manifest.json")) : {}
     );
 
-    // 读取配置文件，注入给客户端
-    const baseparsed = dotenv.config({ path: resolve('.env') }).parsed;
-    const parsed = dotenv.config({ path: resolve(`.env.${process.env.NODE_ENV}`) }).parsed;
-
-    const state =
-      "<script>window.__INIT_STATE__=" +
-      serialize(store, { isJSON: true }) + ";" +
-      'window.__APP_CONFIG__=' + serialize({ ...baseparsed, ...parsed }, { isJSON: true }) +
-      "</script>";
+    console.log(rootHtml, '9999999999999999999999');
 
     const html = template
       .replace(`<!--preload-links-->`, preloadLinks)
-      .replace(`<!--app-html-->`, rootHtml)
-      .replace(`<!--app-store-->`, state);
+      .replace(`<!--app-html-->`, rootHtml);
 
     return html;
-  }
 }
-
 export const serverRender = async (req: Request, main: any) => {
   const { router, store } = main;
 
@@ -90,10 +49,6 @@ export const serverRender = async (req: Request, main: any) => {
 	router.push(originalUrl);
 
 	await router.isReady();
-	const { pd } = router.currentRoute.value.query;
-
-	Number(pd) && store.$setSsrPath(originalUrl);
-	return getAsyncData(router, store, true, query as any);
 } 
 
 export const renderRootHtml = async (

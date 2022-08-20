@@ -1,0 +1,28 @@
+{
+  "name": "create-npxt",
+  "version": "1.0.0",
+  "description": "create-npxt",
+  "bin": {
+    "create-nxpt": "index.js",
+    "cnp": "index.js"
+  },
+  "files": [
+    "index.js",
+    "template-*"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "npxt"
+  ],
+  "author": "xiaopf@300624.cn",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^10.1.0",
+    "kolorist": "^1.5.1",
+    "minimist": "^1.2.6",
+    "prompts": "^2.4.2"
+  }
+}

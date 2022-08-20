@@ -1,101 +1,60 @@
-import { cac } from "cac";
-import { build, LogLevel, ServerOptions, BuildOptions } from "vite";
-import { mergeNxxtConfig } from "./config";
-import { getBaseBuildConfig, getClientOptions } from "./build/index";
-import { SSR } from "./ssr/ssr";
+import mri from 'mri'
+import { red } from 'colorette'
+import consola from 'consola'
+// import { checkEngines } from './utils/engines'
+import { commands, Command, NpxtCommand } from './commands'
+import { showHelp } from './utils/help'
+import { showBanner } from './utils/banner'
 
-const cli = cac("nxxt");
+async function _main () {
+  const _argv = process.argv.slice(2)
+  const args = mri(_argv, {
+    boolean: [
+      'no-clear'
+    ]
+  })
+  // @ts-ignore
+  const command = args._.shift()
 
-interface GlobalCLIOptions {
-  "--"?: string[];
-  c?: boolean | string;
-  config?: string;
-  r?: string;
-  root?: string;
-  base?: string;
-  l?: LogLevel;
-  logLevel?: LogLevel;
-  clearScreen?: boolean;
-  d?: boolean | string;
-  debug?: boolean | string;
-  f?: string;
-  filter?: string;
-  m?: string;
-  mode?: string;
+  showBanner(command === 'dev' && args.clear !== false && !args.help)
+
+  if (!(command in commands)) {
+    console.log('\n' + red('Invalid command ' + command))
+
+    // await commands.usage().then(r => r.invoke())
+    process.exit(1)
+  }
+
+  // Check Node.js version in background
+//   setTimeout(() => { checkEngines().catch(() => {}) }, 1000)
+
+  // @ts-ignore default.default is hotfix for #621
+  const cmd = await commands[command as Command]() as NpxtCommand
+  if (args.h || args.help) {
+    showHelp(cmd.meta)
+  } else {
+    const result = await cmd.invoke(args)
+    return result
+  }
 }
 
-function cleanOptions<Options extends GlobalCLIOptions>(
-  options: Options
-): Omit<Options, keyof GlobalCLIOptions> {
-  const ret = { ...options }
-  delete ret['--']
-  // delete ret.c
-  // delete ret.config
-  // delete ret.r
-  // delete ret.root
-  // delete ret.base
-  // delete ret.l
-  // delete ret.logLevel
-  // delete ret.clearScreen
-  // delete ret.d
-  // delete ret.debug
-  // delete ret.f
-  // delete ret.filter
-  // delete ret.m
-  // delete ret.mode
-  return ret
+// Wrap all console logs with consola for better DX
+consola.wrapConsole()
+
+process.on('unhandledRejection', err => consola.error('[unhandledRejection]', err))
+process.on('uncaughtException', err => consola.error('[uncaughtException]', err))
+
+export function main () {
+  _main()
+    .then((result) => {
+      if (result === 'error') {
+        process.exit(1)
+      } else if (result !== 'wait') {
+        process.exit(0)
+      }
+    })
+    .catch((error) => {
+      consola.error(error)
+      process.exit(1)
+    })
 }
-
-cli.option("-m, --mode <mode>", `[string] set env mode`);
-
-// dev
-cli
-  .command("[root]") // default command
-  .alias("serve")
-  .action((root: string, options: ServerOptions & GlobalCLIOptions) => {
-    const config = mergeNxxtConfig({
-      root,
-      ...cleanOptions(options),
-    });
-    const buildOptions = getClientOptions(config);
-    new SSR({
-      buildOptions,
-      config
-    });
-  });
-
-// build
-cli
-  .command("build [root]")
-  .action(async (root: string, options: BuildOptions & GlobalCLIOptions) => {
-    const config = mergeNxxtConfig({
-      root,
-      ...cleanOptions(options),
-    });
-
-    const { clientOptions, serverOptions } = getBaseBuildConfig(config);
-
-    build(clientOptions);
-    build(serverOptions);
-  });
-
-// start
-cli
-  .command("start [root]")
-  .action((root: string, options: ServerOptions & GlobalCLIOptions) => {
-    const config = mergeNxxtConfig({
-      root,
-      ...cleanOptions(options),
-    });
-    const buildOptions = getClientOptions(config);
-    new SSR({
-      buildOptions,
-      config,
-      runType: "build",
-    });
-  });
-
-cli.help();
-cli.version(require("../package.json").version);
-
-cli.parse();

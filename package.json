@@ -1,43 +1,35 @@
 {
-  "name": "nxxt-monorepo",
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "description": "Rendering scaffolding of server based on vite, Vue 3.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Vitaminaq/nxxt.git",
-    "directory": "."
-  },
-  "keywords": [
-    "vue",
-    "ssr",
-    "vite",
-    "cli"
-  ],
-  "author": "Vitaminaq",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Vitaminaq/nxxt/issues"
-  },
-  "homepage": "https://github.com/Vitaminaq/nxxt",
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "build": "cd packages/cli && npm run build"
-  },
-  "dependencies": {
-    "conventional-changelog-cli": "^2.1.1",
-    "nxxt": "workspace:*"
-  },
-  "engines": {
-    "node": "^12.0.0 || >= 14.0.0"
-  },
-  "devDependencies": {
-    "npm-run-all": "^4.1.5",
-    "rimraf": "^3.0.2"
-  },
-  "packageManager": "pnpm"
-}
+    "name": "npxt-monorepo",
+    "private": true,
+    "workspaces": [
+      "packages/*"
+    ],
+    "description": "Rendering scaffolding of server based on vite 3.0, Vue 3.0",
+    "repository": {
+      "type": "git",
+      "url": "",
+      "directory": "."
+    },
+    "keywords": [
+      "vue",
+      "ssr",
+      "vite",
+      "cli"
+    ],
+    "author": "xiaopf@300624.cn",
+    "license": "MIT",
+    "publishConfig": {
+      "access": "public"
+    },
+    "scripts": {
+      "build": "cd packages/cli && npm run build"
+    },
+    "dependencies": {
+      "npxt": "workspace:*"
+    },
+    "engines": {
+      "node": "^12.0.0 || >= 14.0.0"
+    },
+    "packageManager": "pnpm"
+  }
+  

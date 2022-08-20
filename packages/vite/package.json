@@ -1,0 +1,22 @@
+{
+  "name": "@npxt/vite-builder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "unbuild"
+  },
+  "author": "xiaopf@300624.cn",
+  "license": "ISC",
+  "devDependencies": {
+    "unbuild": "^0.7.6",
+    "vue": "^3.2.37"
+  },
+  "dependencies": {
+    "@rollup/plugin-replace": "^4.0.0",
+    "@vitejs/plugin-vue": "^3.0.1",
+    "@vitejs/plugin-vue-jsx": "^2.0.0",
+    "rollup": "^2.77.2",
+    "vite": "^3.0.4"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": false,
+    "allowJs": true,
+    "noUnusedLocals": true,
+    "resolveJsonModule": true
+  },
+  "exclude": [
+    "**/*/dist/*",
+    "**/examples/**",
+    "**/bin/**",
+    "**/packages/create-npxt/**",
+  ]
+}

@@ -1,83 +1,84 @@
-import express, { Express, Request, Response } from "express";
-import { Render } from "./render";
-import { resolve, getDirFiles, resolveModule, showBanner } from "../utils";
+// import express, { Express, Request, Response } from "express";
+// import { resolve } from 'pathe';
+// import { isBuild } from '../utils/env';
+// import { renderHtml } from './render';
+// import { showBanner, getDirFiles, resolveModule } from '../utils/utils';
+// import { NpxtConfig } from '../utils/config';
 
-const getUserMiddleware = () => {
-  return getDirFiles('middleware').map(i => {
-    return resolveModule(`./middleware/${i}`);
-  })
-}
+// const getUserMiddleware = () => {
+//   return getDirFiles('middleware').map(i => {
+//     return resolveModule(`./middleware/${i}`);
+//   })
+// }
 
-export class Server {
-  public render: Render;
-  public app: Express;
+// export class Server {
+//   public app: Express;
+//   public ctx: NpxtConfig;
 
-  public constructor(render: Render) {
-    this.render = render;
-    this.app = express();
-    this.middleware();
-    this.listen();
-  }
+//   public constructor(ctx: NpxtConfig) {
+//     this.app = express();
+//     this.ctx = ctx;
+//     this.middleware();
+//     this.listen();
+//   }
 
-  public async middleware() {
-    const { app, render } = this;
+//   public async middleware() {
+//     const { app } = this;
 
-    // custom middleware
-    getUserMiddleware().forEach(mid => mid(app));
+//     console.log('middleware');
+
+//     // custom middleware
+//     getUserMiddleware().forEach(mid => mid(app));
+
+//     const build = isBuild();
     
-    if (!render.ssr.isBuild) {
-      if (!this.render.devServer) return;
-      app.use(this.render.devServer.middlewares);
-    } else {
-      app.use(require("compression")());
-      app.use(
-        require("serve-static")(resolve("dist/client"), {
-          index: false,
-          setHeaders: (res: any) => {
-            res.setHeader("Cache-Control", "public,max-age=31536000");
-          },
-        })
-      );
-      // 响应拦截
-      app.use(
-        require("route-cache").cacheSeconds(60, (req: Request) => {
-          const { v, pd } = req.query;
-          // 预取数据模式不做缓存
-          return !Number(pd) && v && `${req.path}${v}`;
-        })
-      );
-    }
-    this.registerRoute();
-  }
+//     if (!build) {
+//       if (!this.ctx.devServer) return;
+//       app.use(this.ctx.devServer.middlewares);
+//     } else {
+//       app.use(require("compression")());
+//       app.use(
+//         require("serve-static")(resolve("dist/client"), {
+//           index: false,
+//           setHeaders: (res: any) => {
+//             res.setHeader("Cache-Control", "public,max-age=31536000");
+//           },
+//         })
+//       );
+//     }
+//     this.registerRoute();
+//   }
 
-  public registerRoute() {
-    this.app.use("*", async (req: Request, res: Response) => {
-      if (req.method.toLocaleLowerCase() !== 'get' || req.originalUrl === '/favicon.ico')
-        return;
-      try {
-        const html = await this.render.renderHtml(req);
-        // 禁用send的弱缓存
-        res
-          .status(200)
-          .set({
-            "Content-Type": "text/html",
-            "Cache-Control": "no-cache",
-          })
-          .send(html);
-      } catch (e: any) {
-        const { devServer } = this.render;
-        devServer && devServer.ssrFixStacktrace(e);
-        console.log(e.stack);
-        res.status(500).end(e.stack);
-      }
-    });
-  }
+//   public registerRoute() {
+//     console.log('registerRoute');
+//     this.app.use("*", async (req: Request, res: Response) => {
+//       console.log('111111111111111111111111');
+//       if (req.method.toLocaleLowerCase() !== 'get' || req.originalUrl === '/favicon.ico')
+//         return;
+//       try {
+//         console.log('ppppppppppppppppppppppppp');
+//         const html = await renderHtml(req, this.ctx);
+//         // 禁用send的弱缓存
+//         res
+//           .status(200)
+//           .set({
+//             "Content-Type": "text/html",
+//             "Cache-Control": "no-cache",
+//           })
+//           .send(html);
+//       } catch (e: any) {
+//         const { devServer } = this.ctx;
+//         devServer && devServer.ssrFixStacktrace(e);
+//         console.log(e.stack);
+//         res.status(500).end(e.stack);
+//       }
+//     });
+//   }
 
-  public listen() {
-    const { app, render } = this;
-    const { port = 3000 } = render.ssr.config;
-    return app.listen(port, () => {
-      return showBanner(this);
-    });
-  }
-}
+//   public listen() {
+//     const { app } = this;
+//     return app.listen(3000, () => {
+//       return showBanner();
+//     });
+//   }
+// }

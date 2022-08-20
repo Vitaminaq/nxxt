@@ -1,5 +1,5 @@
-import { NxxtUserConfig } from './config';
+import { NpxtUserConfig } from './utils/config';
 
-export const defineNxxtConfig = (options: NxxtUserConfig): NxxtUserConfig => {
+export const defineNpxtConfig = (options: NpxtUserConfig): NpxtUserConfig => {
     return options;
 };
